@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -42,10 +43,15 @@
   body {
     @apply bg-[#121212] text-[#F5F5F5];
     font-family: 'Inter', 'Poppins', sans-serif;
+    overflow-x: hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-medium tracking-tight;
+  }
+  
+  html {
+    scroll-behavior: smooth;
   }
 }
 
@@ -71,8 +77,8 @@
   
   .fade-in-up {
     opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
   }
   
   .in-view {
@@ -96,7 +102,7 @@
   
   .marquee-content {
     display: inline-block;
-    animation: marquee 15s linear infinite;
+    animation: marquee 30s linear infinite;
   }
   
   .fade-edges {
@@ -120,11 +126,62 @@
   }
 
   .animate-shine {
-    animation: shine 1s ease-in-out;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .animate-shine::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(30deg);
+    animation: shine 3s infinite;
+  }
+
+  /* Particle wave animation */
+  .wave-particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: rgba(245, 245, 245, 0.3);
+    animation: wave-float 12s infinite ease-in-out;
+  }
+  
+  @keyframes wave-float {
+    0%, 100% {
+      transform: translateY(0) translateX(0);
+      opacity: 0;
+    }
+    25% {
+      transform: translateY(-50px) translateX(20px);
+      opacity: 0.5;
+    }
+    50% {
+      transform: translateY(-100px) translateX(-20px);
+      opacity: 0.3;
+    }
+    75% {
+      transform: translateY(-150px) translateX(30px);
+      opacity: 0.1;
+    }
+    100% {
+      transform: translateY(-200px) translateX(0);
+      opacity: 0;
+    }
   }
 
   .section-padding {
-    @apply py-24 px-8 md:px-16;
+    @apply py-32 px-8 md:px-16;
   }
 
   .line-clamp-4 {
@@ -132,5 +189,64 @@
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+  
+  /* Parallax scroll effects */
+  [data-parallax] {
+    transition: transform 0.1s ease-out;
+    will-change: transform;
+  }
+  
+  [data-scroll="fade-up"] {
+    opacity: 0;
+    transform: translateY(60px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+  
+  [data-scroll="fade-up"].in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  [data-scroll="fade-in"] {
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  
+  [data-scroll="fade-in"].in-view {
+    opacity: 1;
+  }
+  
+  [data-scroll="slide-left"] {
+    opacity: 0;
+    transform: translateX(-60px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+  
+  [data-scroll="slide-left"].in-view {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  [data-scroll="slide-right"] {
+    opacity: 0;
+    transform: translateX(60px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+  
+  [data-scroll="slide-right"].in-view {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  [data-stagger] > * {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  
+  [data-stagger] > *.in-view {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

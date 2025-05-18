@@ -63,14 +63,16 @@ const HowItWorks: React.FC = () => {
   return (
     <section 
       ref={sectionRef}
-      className="section-padding bg-[#F5F5F5] text-[#121212]"
+      className="section-padding bg-[#F5F5F5] text-[#121212] min-h-screen flex items-center"
+      id="how-it-works"
     >
       <div className="container mx-auto">
-        <h2 className="text-4xl font-semibold mb-16 text-center">How It Works</h2>
+        <h2 className="text-5xl font-semibold mb-20 text-center" data-scroll="fade-up">How It Works</h2>
         
         <div 
           ref={timelineRef}
           className="relative max-w-4xl mx-auto mb-20"
+          data-scroll="fade-up"
         >
           {/* Timeline line */}
           <div className="absolute top-8 left-0 right-0 h-1 bg-gray-300"></div>
@@ -88,6 +90,7 @@ const HowItWorks: React.FC = () => {
         <div 
           ref={codeRef}
           className={`bg-gray-100 rounded-lg p-8 max-w-3xl mx-auto font-mono text-base overflow-x-auto transition-all duration-700 ${codeVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-10'}`}
+          data-scroll="fade-up"
         >
           <div className="mb-6">
             <span className="text-gray-500">// Generate a new script</span>

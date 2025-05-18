@@ -5,12 +5,23 @@ interface FeatureCardProps {
   icon: React.ReactNode;
   title: string;
   description: string;
+  index: number;
 }
 
-const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) => {
+const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description, index }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    if (cardRef.current) {
+      cardRef.current.style.transitionDelay = `${index * 100}ms`;
+    }
+  }, [index]);
+  
   return (
     <div 
-      className="bg-[#F5F5F5] text-[#121212] border-2 border-transparent rounded-lg p-8 transition-all duration-300 hover:border-[#121212]"
+      ref={cardRef}
+      className="bg-[#F5F5F5] text-[#121212] border-2 border-transparent rounded-lg p-8 transition-all duration-300 hover:border-[#121212] fade-in-up"
+      data-scroll="fade-up"
     >
       <div className="text-gray-500 mb-6">
         {icon}
@@ -22,6 +33,8 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) =
 };
 
 const FeatureSection: React.FC = () => {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  
   const features = [
     {
       icon: (
@@ -62,17 +75,22 @@ const FeatureSection: React.FC = () => {
   ];
 
   return (
-    <section className="section-padding bg-[#121212] text-[#F5F5F5]">
+    <section 
+      ref={sectionRef}
+      className="section-padding bg-[#121212] text-[#F5F5F5] min-h-screen flex items-center"
+      id="features"
+    >
       <div className="container mx-auto">
-        <h2 className="text-4xl font-semibold mb-16 text-center">Features Deep-Dive</h2>
+        <h2 className="text-5xl font-semibold mb-20 text-center" data-scroll="fade-up">Features Deep-Dive</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" data-stagger>
           {features.map((feature, index) => (
             <FeatureCard
               key={index}
               icon={feature.icon}
               title={feature.title}
               description={feature.description}
+              index={index}
             />
           ))}
         </div>
