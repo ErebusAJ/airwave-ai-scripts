@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
+import LoginDialog from './LoginDialog';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -24,12 +25,9 @@ const Navbar: React.FC = () => {
           </div>
           
           <div>
-            <Link 
-              to="/" 
-              className="hidden md:inline-block bg-[#F5F5F5] text-[#121212] px-4 py-2 rounded hover:bg-opacity-90 transition-all"
-            >
-              Login
-            </Link>
+            <div className="hidden md:inline-block">
+              <LoginDialog />
+            </div>
             
             <button 
               className="md:hidden text-[#F5F5F5]"
@@ -47,12 +45,9 @@ const Navbar: React.FC = () => {
           <Link to="/" className="text-[#F5F5F5] hover:text-gray-300 transition-colors">How It Works</Link>
           <Link to="/" className="text-[#F5F5F5] hover:text-gray-300 transition-colors">Pricing</Link>
           <Link to="/" className="text-[#F5F5F5] hover:text-gray-300 transition-colors">Support</Link>
-          <Link 
-            to="/" 
-            className="bg-[#F5F5F5] text-[#121212] px-4 py-2 rounded hover:bg-opacity-90 transition-all w-full text-center"
-          >
-            Login
-          </Link>
+          <div className="w-full">
+            <LoginDialog />
+          </div>
         </div>
       </div>
     </nav>
