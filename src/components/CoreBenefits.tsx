@@ -19,12 +19,12 @@ const BenefitCard: React.FC<BenefitCardProps> = ({ icon, title, delay }) => {
   return (
     <div 
       ref={cardRef}
-      className="bg-white text-black rounded-lg p-6 text-center fade-in-up card-hover"
+      className="bg-[#F5F5F5] text-[#121212] rounded-lg p-8 text-center fade-in-up card-hover"
     >
-      <div className="text-gray-600 mb-4 flex justify-center">
+      <div className="text-gray-600 mb-6 flex justify-center">
         {icon}
       </div>
-      <h3 className="text-xl font-medium">{title}</h3>
+      <h3 className="text-2xl font-medium">{title}</h3>
     </div>
   );
 };
@@ -60,18 +60,18 @@ const CoreBenefits: React.FC = () => {
   return (
     <section
       ref={sectionRef}
-      className="py-20 px-6 bg-white text-black"
+      className="section-padding bg-[#F5F5F5] text-[#121212]"
     >
       <div className="container mx-auto">
-        <h2 className="text-3xl font-semibold mb-12 text-center">Core Benefits</h2>
+        <h2 className="text-4xl font-semibold mb-16 text-center">Core Benefits</h2>
         
         <div 
           ref={cardsRef}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
         >
           <BenefitCard 
             icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             } 
@@ -80,7 +80,7 @@ const CoreBenefits: React.FC = () => {
           />
           <BenefitCard 
             icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             } 
@@ -89,7 +89,7 @@ const CoreBenefits: React.FC = () => {
           />
           <BenefitCard 
             icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
               </svg>
             } 
@@ -98,7 +98,7 @@ const CoreBenefits: React.FC = () => {
           />
           <BenefitCard 
             icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
               </svg>
             } 

@@ -46,18 +46,18 @@ const TestimonialsSection: React.FC = () => {
   const allTestimonials = [...testimonials, ...testimonials];
 
   return (
-    <section className="py-16 bg-black overflow-hidden">
-      <h2 className="text-3xl font-semibold mb-12 text-center text-white">What Our Users Say</h2>
+    <section className="py-24 bg-[#121212] overflow-hidden">
+      <h2 className="text-4xl font-semibold mb-16 text-center text-[#F5F5F5]">What Our Users Say</h2>
       
       <div className="marquee fade-edges">
-        <div className="marquee-content py-4">
-          <div className="flex space-x-6">
+        <div className="marquee-content py-6">
+          <div className="flex space-x-8">
             {allTestimonials.map((testimonial, index) => (
               <div 
                 key={index}
-                className="bg-white text-black rounded-lg p-6 shadow-lg min-w-[300px] max-w-sm flex-shrink-0"
+                className="bg-[#F5F5F5] text-[#121212] rounded-lg p-8 shadow-lg min-w-[360px] max-w-sm flex-shrink-0"
               >
-                <p className="mb-4 text-gray-800">&ldquo;{testimonial.quote}&rdquo;</p>
+                <p className="mb-6 text-gray-800 text-lg">&ldquo;{testimonial.quote}&rdquo;</p>
                 <div>
                   <p className="font-semibold">{testimonial.name}</p>
                   <p className="text-gray-600 text-sm">{testimonial.role}, {testimonial.company}</p>

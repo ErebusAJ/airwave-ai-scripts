@@ -29,22 +29,22 @@ const TryItOutSection: React.FC = () => {
   return (
     <section 
       ref={sectionRef}
-      className="py-20 px-6 bg-black flex items-center justify-center"
+      className="py-24 px-6 bg-[#121212] flex items-center justify-center"
     >
       <div 
         ref={cardRef}
-        className="bg-white text-black rounded-lg shadow-2xl p-8 max-w-2xl w-full fade-in-up card-hover"
+        className="bg-[#F5F5F5] text-[#121212] rounded-lg shadow-2xl p-10 max-w-2xl w-full fade-in-up card-hover"
       >
-        <h2 className="text-3xl font-semibold mb-6 text-center">
+        <h2 className="text-3xl font-semibold mb-8 text-center">
           Ready to Create Your First Script?
         </h2>
         <div className="flex flex-col sm:flex-row gap-4">
           <input
             type="text"
             placeholder="Enter your topic or idea here..."
-            className="flex-grow px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+            className="flex-grow px-5 py-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#121212]"
           />
-          <button className="bg-black text-white px-6 py-3 rounded-md font-medium transition-all hover:bg-white hover:text-black hover:shadow-md hover:border-black border-2 border-black">
+          <button className="bg-[#121212] text-[#F5F5F5] px-6 py-4 rounded-md font-medium transition-all hover:bg-[#F5F5F5] hover:text-[#121212] hover:shadow-md hover:border-[#121212] border-2 border-[#121212]">
             Generate
           </button>
         </div>

@@ -14,24 +14,24 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
 
-    --primary: 0 0% 0%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 0 0% 7%;
+    --primary-foreground: 0 0% 96%;
 
     --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 0%;
+    --secondary-foreground: 0 0% 7%;
 
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 60%;
 
     --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 0%;
+    --accent-foreground: 0 0% 7%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
-    --ring: 0 0% 0%;
+    --ring: 0 0% 7%;
 
     --radius: 0.5rem;
   }
@@ -41,7 +41,7 @@
   }
 
   body {
-    @apply bg-black text-white;
+    @apply bg-[#121212] text-[#F5F5F5];
     font-family: 'Inter', 'Poppins', sans-serif;
   }
 
@@ -62,7 +62,7 @@
     height: 2px;
     bottom: -6px;
     left: 0;
-    background-color: white;
+    background-color: #F5F5F5;
     transition: width 0.8s ease;
   }
   
@@ -112,5 +112,9 @@
   @keyframes spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
+  }
+
+  .section-padding {
+    @apply py-24 px-8 md:px-16;
   }
 }

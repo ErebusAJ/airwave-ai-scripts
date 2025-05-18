@@ -22,31 +22,31 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, price, features, highli
   return (
     <div 
       ref={cardRef}
-      className={`bg-white text-black rounded-lg overflow-hidden fade-in-up card-hover ${highlighted ? 'border-4 border-black' : 'border border-gray-200'}`}
+      className={`bg-[#F5F5F5] text-[#121212] rounded-lg overflow-hidden fade-in-up card-hover ${highlighted ? 'border-4 border-[#121212]' : 'border border-gray-200'}`}
     >
-      <div className="p-6">
-        <h3 className="text-xl font-semibold mb-2">{plan}</h3>
-        <div className="mb-6">
-          <span className="text-3xl font-bold">{price}</span>
+      <div className="p-8">
+        <h3 className="text-2xl font-semibold mb-3">{plan}</h3>
+        <div className="mb-8">
+          <span className="text-4xl font-bold">{price}</span>
           {price !== 'Custom' && <span className="text-gray-500">/month</span>}
         </div>
         
-        <ul className="space-y-3 mb-8">
+        <ul className="space-y-4 mb-10">
           {features.map((feature, index) => (
             <li key={index} className="flex items-start">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black mr-2 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#121212] mr-3 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
-              <span>{feature}</span>
+              <span className="text-lg">{feature}</span>
             </li>
           ))}
         </ul>
         
         <button 
-          className={`w-full py-3 rounded-md transition-all ${
+          className={`w-full py-4 rounded-md transition-all text-lg ${
             highlighted 
-              ? 'bg-black text-white hover:bg-white hover:text-black border-2 border-black' 
-              : 'bg-gray-100 text-black hover:bg-black hover:text-white'
+              ? 'bg-[#121212] text-[#F5F5F5] hover:bg-[#F5F5F5] hover:text-[#121212] border-2 border-[#121212]' 
+              : 'bg-gray-100 text-[#121212] hover:bg-[#121212] hover:text-[#F5F5F5]'
           }`}
         >
           {cta}
@@ -87,14 +87,14 @@ const PricingSection: React.FC = () => {
   return (
     <section
       ref={sectionRef}
-      className="py-20 px-6 bg-black"
+      className="section-padding bg-[#121212]"
     >
       <div className="container mx-auto">
-        <h2 className="text-3xl font-semibold mb-12 text-center text-white">Pricing Plans</h2>
+        <h2 className="text-4xl font-semibold mb-16 text-center text-[#F5F5F5]">Pricing Plans</h2>
         
         <div 
           ref={cardsRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
         >
           <PricingCard
             plan="Free"

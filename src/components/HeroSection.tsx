@@ -20,7 +20,7 @@ const HeroSection: React.FC = () => {
       <div className="max-w-4xl mx-auto">
         <h1 
           ref={headlineRef} 
-          className="text-4xl md:text-5xl lg:text-6xl font-semibold mb-6 animate-underline"
+          className="text-4xl md:text-5xl lg:text-6xl font-semibold mb-6 animate-underline text-[#F5F5F5]"
         >
           From Idea to Airwaves in One Click.
         </h1>
@@ -28,10 +28,10 @@ const HeroSection: React.FC = () => {
           Generate pro video scripts and instant AI voice-overs.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <button className="bg-white text-black px-8 py-3 rounded-md font-medium transition-all hover:bg-black hover:text-white hover:border-white border-2 border-white">
+          <button className="bg-[#F5F5F5] text-[#121212] px-8 py-3 rounded-md font-medium transition-all hover:bg-[#121212] hover:text-[#F5F5F5] hover:border-[#F5F5F5] border-2 border-[#F5F5F5]">
             Try It Free
           </button>
-          <button className="border-2 border-white text-white px-8 py-3 rounded-md font-medium transition-all hover:bg-white hover:text-black">
+          <button className="border-2 border-[#F5F5F5] text-[#F5F5F5] px-8 py-3 rounded-md font-medium transition-all hover:bg-[#F5F5F5] hover:text-[#121212]">
             See Demo
           </button>
         </div>
