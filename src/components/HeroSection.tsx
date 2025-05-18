@@ -16,7 +16,7 @@ const HeroSection: React.FC = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6">
+    <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 bg-[#121212]">
       <div className="max-w-4xl mx-auto">
         <h1 
           ref={headlineRef} 

@@ -22,9 +22,9 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, price, features, highli
   return (
     <div 
       ref={cardRef}
-      className={`bg-[#F5F5F5] text-[#121212] rounded-lg overflow-hidden fade-in-up card-hover ${highlighted ? 'border-4 border-[#121212]' : 'border border-gray-200'}`}
+      className={`bg-[#F5F5F5] text-[#121212] rounded-lg overflow-hidden fade-in-up card-hover flex flex-col ${highlighted ? 'border-4 border-[#121212]' : 'border border-gray-200'}`}
     >
-      <div className="p-8">
+      <div className="p-8 flex-grow">
         <h3 className="text-2xl font-semibold mb-3">{plan}</h3>
         <div className="mb-8">
           <span className="text-4xl font-bold">{price}</span>
@@ -41,15 +41,14 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, price, features, highli
             </li>
           ))}
         </ul>
-        
+      </div>
+      
+      <div className="p-6 mt-auto">
         <button 
-          className={`w-full py-4 rounded-md transition-all text-lg ${
-            highlighted 
-              ? 'bg-[#121212] text-[#F5F5F5] hover:bg-[#F5F5F5] hover:text-[#121212] border-2 border-[#121212]' 
-              : 'bg-gray-100 text-[#121212] hover:bg-[#121212] hover:text-[#F5F5F5]'
-          }`}
+          className="w-full py-4 rounded-md transition-all text-lg bg-[#121212] text-[#F5F5F5] hover:bg-[#121212] hover:text-[#F5F5F5] relative overflow-hidden"
         >
-          {cta}
+          <span className="relative z-10">{cta}</span>
+          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.2)] to-transparent -translate-x-full hover:animate-shine"></span>
         </button>
       </div>
     </div>
@@ -107,7 +106,7 @@ const PricingSection: React.FC = () => {
             ]}
             cta="Get Started"
             delay={0}
-            highlighted
+            highlighted={true}
           />
           <PricingCard
             plan="Starter"

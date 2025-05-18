@@ -19,7 +19,7 @@ const BenefitCard: React.FC<BenefitCardProps> = ({ icon, title, delay }) => {
   return (
     <div 
       ref={cardRef}
-      className="bg-[#F5F5F5] text-[#121212] rounded-lg p-8 text-center fade-in-up card-hover"
+      className="bg-white text-[#121212] rounded-lg p-8 text-center fade-in-up card-hover shadow-lg border border-gray-200"
     >
       <div className="text-gray-600 mb-6 flex justify-center">
         {icon}
@@ -60,7 +60,7 @@ const CoreBenefits: React.FC = () => {
   return (
     <section
       ref={sectionRef}
-      className="section-padding bg-[#F5F5F5] text-[#121212]"
+      className="section-padding bg-[#EBEBEB] text-[#121212]"
     >
       <div className="container mx-auto">
         <h2 className="text-4xl font-semibold mb-16 text-center">Core Benefits</h2>

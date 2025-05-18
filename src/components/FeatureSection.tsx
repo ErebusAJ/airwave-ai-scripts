@@ -8,26 +8,11 @@ interface FeatureCardProps {
 }
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) => {
-  const iconRef = useRef<HTMLDivElement>(null);
-  
-  const handleMouseEnter = () => {
-    if (iconRef.current) {
-      iconRef.current.style.animation = 'spin 0.5s ease-in-out';
-      
-      setTimeout(() => {
-        if (iconRef.current) {
-          iconRef.current.style.animation = '';
-        }
-      }, 500);
-    }
-  };
-
   return (
     <div 
       className="bg-[#F5F5F5] text-[#121212] border-2 border-transparent rounded-lg p-8 transition-all duration-300 hover:border-[#121212]"
-      onMouseEnter={handleMouseEnter}
     >
-      <div ref={iconRef} className="text-gray-500 mb-6">
+      <div className="text-gray-500 mb-6">
         {icon}
       </div>
       <h3 className="text-2xl font-medium mb-4">{title}</h3>

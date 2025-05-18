@@ -114,6 +114,16 @@
     to { transform: rotate(360deg); }
   }
 
+  @keyframes shine {
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-shine {
+    animation: shine 1s ease-in-out;
+  }
+
   .section-padding {
     @apply py-24 px-8 md:px-16;
   }
