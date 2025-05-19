@@ -4,7 +4,8 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
-import { MarkdownIcon } from 'lucide-react';
+import { FileText } from 'lucide-react';
+import { ScrollArea } from './ui/scroll-area';
 
 const TryItOutSection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -13,6 +14,7 @@ const TryItOutSection: React.FC = () => {
   const [tags, setTags] = useState("");
   const [showMarkdown, setShowMarkdown] = useState(false);
   const [generatedScript, setGeneratedScript] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -177,21 +179,75 @@ ${tags ? `\n## Tags\n${tags.split(',').map(tag => `#${tag.trim()}`).join(' ')}` 
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-3xl font-semibold">
               <span className="flex items-center gap-2">
-                <MarkdownIcon size={28} />
+                <FileText size={28} />
                 Generated Script
               </span>
             </h2>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowMarkdown(false)}
-              className="border-2 border-[#121212] hover:bg-[#121212] hover:text-[#F5F5F5]"
-            >
-              Back to Form
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setIsEditing(!isEditing)}
+                className="border-2 border-[#121212] hover:bg-[#121212] hover:text-[#F5F5F5]"
+              >
+                {isEditing ? "View Mode" : "Edit Mode"}
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowMarkdown(false)}
+                className="border-2 border-[#121212] hover:bg-[#121212] hover:text-[#F5F5F5]"
+              >
+                Back to Form
+              </Button>
+            </div>
           </div>
           
-          <div className="bg-[#111] text-[#F5F5F5] p-6 rounded-lg font-mono overflow-auto max-h-[60vh]">
-            <pre className="whitespace-pre-wrap">{generatedScript}</pre>
+          <div className="bg-[#FDF7E9] border border-[#DEC99B] rounded-lg shadow-md overflow-hidden">
+            <div className="border-b border-[#DEC99B] bg-[#F5EFD9] py-2 px-4 flex items-center justify-between">
+              <div className="font-serif text-[#8A7356]">{platform.charAt(0).toUpperCase() + platform.slice(1)} Script</div>
+              <div className="text-xs text-[#8A7356]">Created {new Date().toLocaleDateString()}</div>
+            </div>
+            
+            <ScrollArea className="h-[60vh] p-8 bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEX///////////////////////////////////////////////////////////////////////////////////////////94o5pzAAAAG3RSTlMAAQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRpAX7LzAAABPklEQVRIx9XW2a6DIBSG0W+AARK1zPP7P2lPT9LENgb3vWi8XMtE/gGAlZjUFkuRGsMwN9RxAiCitwJFP9VxAZCzu3e6XftVwe2ZxkXRqLqzPe4ADJ1pXBaNtonoPMBUMYm1vZ8AtmE5AFhKtZPk4wRwnA1cXXlHpTHVDUC9qz7o5wP3OgFYc0fe9U5TTpLlCGDI21IdpZpO2eyA+S2o1fJ+sEdgk9NIvX7O+NkdM0+l253cvzXvHVMmdmGtV8RTLsZHfGVEbNFnRKzWEhHrNUbERk0RsVmHv8Y/GHG6P3NH5l9oyJIaeYyM1MjAiLwYeWRk5sTIZOQ1kLXtOQwel2GMHFnvFA4DE+PoiHX4hMNgSIzcRsJhkPJGvi+6OF0gu+Ya9Yo/9GKQMIL5hLyRVz56A7Oph/3Zr/TiqeonAAAAAElFTkSuQmCC')]">
+              {isEditing ? (
+                <Textarea
+                  value={generatedScript}
+                  onChange={(e) => setGeneratedScript(e.target.value)}
+                  className="w-full min-h-full p-0 bg-transparent text-[#33302E] font-serif text-lg leading-relaxed resize-none focus:outline-none focus:ring-0 border-none"
+                />
+              ) : (
+                <div className="font-serif text-[#33302E] whitespace-pre-wrap px-4 text-lg leading-relaxed markdown-content">
+                  {generatedScript.split('\n').map((line, index) => {
+                    // Heading 1
+                    if (line.startsWith('# ')) {
+                      return <h1 key={index} className="text-3xl font-bold mb-6 text-[#4A3F35]">{line.substring(2)}</h1>;
+                    }
+                    // Heading 2
+                    else if (line.startsWith('## ')) {
+                      return <h2 key={index} className="text-2xl font-semibold mb-4 text-[#5A4B3F] border-b border-[#DEC99B] pb-2">{line.substring(3)}</h2>;
+                    }
+                    // Heading 3
+                    else if (line.startsWith('### ')) {
+                      return <h3 key={index} className="text-xl font-medium mb-3 text-[#6A5B4F]">{line.substring(4)}</h3>;
+                    }
+                    // List items
+                    else if (line.startsWith('- ')) {
+                      return <div key={index} className="flex items-start mb-2 ml-4">
+                        <span className="mr-2 text-[#8A7356]">•</span>
+                        <p>{line.substring(2)}</p>
+                      </div>;
+                    }
+                    // Empty line
+                    else if (!line.trim()) {
+                      return <div key={index} className="h-4"></div>;
+                    }
+                    // Regular paragraph
+                    else {
+                      return <p key={index} className="mb-4">{line}</p>;
+                    }
+                  })}
+                </div>
+              )}
+            </ScrollArea>
           </div>
           
           <div className="flex justify-between mt-6">
@@ -203,6 +259,9 @@ ${tags ? `\n## Tags\n${tags.split(',').map(tag => `#${tag.trim()}`).join(' ')}` 
             </Button>
             <Button 
               className="bg-[#121212] text-[#F5F5F5] hover:bg-[#2a2a2a]"
+              onClick={() => {
+                navigator.clipboard.writeText(generatedScript);
+              }}
             >
               Copy to Clipboard
             </Button>
