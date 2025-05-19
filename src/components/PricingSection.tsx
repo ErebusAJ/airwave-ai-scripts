@@ -1,16 +1,26 @@
 
 import React, { useEffect, useRef } from 'react';
+import { cn } from '@/lib/utils';
 
 interface PricingCardProps {
   plan: string;
   price: string;
   features: string[];
   highlighted?: boolean;
+  popular?: boolean;
   cta: string;
   delay: number;
 }
 
-const PricingCard: React.FC<PricingCardProps> = ({ plan, price, features, highlighted, cta, delay }) => {
+const PricingCard: React.FC<PricingCardProps> = ({ 
+  plan, 
+  price, 
+  features, 
+  highlighted, 
+  popular, 
+  cta, 
+  delay 
+}) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,9 +32,19 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, price, features, highli
   return (
     <div 
       ref={cardRef}
-      className={`bg-[#F5F5F5] text-[#121212] rounded-lg overflow-hidden fade-in-up card-hover flex flex-col ${highlighted ? 'border-4 border-[#121212]' : 'border border-gray-200'}`}
+      className={cn(
+        "bg-[#F5F5F5] text-[#121212] rounded-lg overflow-hidden fade-in-up card-hover flex flex-col relative",
+        highlighted ? 'border-4 border-[#121212]' : 'border border-gray-200',
+        popular ? 'transform scale-105 shadow-2xl z-10' : ''
+      )}
       data-scroll="fade-up"
     >
+      {popular && (
+        <div className="absolute top-0 left-0 right-0 bg-[#121212] text-[#F5F5F5] py-1 text-center text-sm font-medium">
+          Most Popular
+        </div>
+      )}
+      
       <div className="p-8 flex-grow">
         <h3 className="text-2xl font-semibold mb-3">{plan}</h3>
         <div className="mb-8">
@@ -46,9 +66,15 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, price, features, highli
       
       <div className="p-6 mt-auto">
         <button 
-          className="w-full py-4 rounded-md transition-all text-lg bg-[#121212] text-[#F5F5F5] hover:bg-[#121212] hover:text-[#F5F5F5] relative overflow-hidden animate-shine"
+          className={cn(
+            "w-full py-4 rounded-md transition-all text-lg relative overflow-hidden group",
+            popular 
+              ? "bg-gradient-to-r from-[#121212] to-[#2a2a2a] text-white hover:shadow-lg" 
+              : "bg-[#121212] text-[#F5F5F5] hover:bg-[#2a2a2a]"
+          )}
         >
           <span className="relative z-10">{cta}</span>
+          <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine opacity-0 group-hover:opacity-100"></div>
         </button>
       </div>
     </div>
@@ -132,6 +158,7 @@ const PricingSection: React.FC = () => {
             ]}
             cta="Choose Pro"
             delay={400}
+            popular={true}
           />
           <PricingCard
             plan="Enterprise"
