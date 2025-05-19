@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 
 interface Testimonial {
@@ -74,16 +73,18 @@ const TestimonialsSection: React.FC = () => {
             {allTestimonials.map((testimonial, index) => (
               <div 
                 key={index}
-                className="bg-[#F5F5F5] text-[#121212] rounded-lg p-8 shadow-lg min-w-[400px] max-w-[400px] flex-shrink-0 h-[280px] flex flex-col justify-between border border-gray-200"
+                className="bg-[#F5F5F5] text-[#121212] rounded-lg p-6 shadow-lg min-w-[380px] max-w-[380px] flex-shrink-0 h-[300px] flex flex-col justify-between border border-gray-200"
                 data-scroll="fade-up"
                 style={{ transition: `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s` }}
               >
-                <p className="mb-6 text-gray-800 text-base leading-relaxed min-h-[160px]">
-                  &ldquo;{testimonial.quote}&rdquo;
-                </p>
-                <div className="mt-auto">
-                  <p className="font-semibold">{testimonial.name}</p>
-                  <p className="text-gray-600 text-sm">{testimonial.role}, {testimonial.company}</p>
+                <div className="flex-1 overflow-hidden">
+                  <p className="text-gray-800 text-[15px] leading-7 whitespace-pre-wrap break-words">
+                    &ldquo;{testimonial.quote}&rdquo;
+                  </p>
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <p className="font-semibold text-[15px]">{testimonial.name}</p>
+                  <p className="text-gray-600 text-sm mt-1">{testimonial.role}, {testimonial.company}</p>
                 </div>
               </div>
             ))}
