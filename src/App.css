@@ -40,3 +40,91 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Keyframes for the "wiggle" animation (for "Writing Script..." step) */
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+/* Keyframes for the diagonal highlight sweep */
+@keyframes sweep-highlight-diagonally {
+  0% {
+    transform: translate(-100%, 100%) skewX(-30deg); /* Start bottom-left, outside */
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.5; /* Highlight visible (using white for light theme card item) */
+  }
+  50% {
+    transform: translate(0%, 0%) skewX(-30deg);    /* Sweep across center */
+    opacity: 0.5;
+  }
+  75% {
+    opacity: 0; /* Fade out */
+  }
+  100% {
+    transform: translate(100%, -100%) skewX(-30deg); /* End top-right, outside */
+    opacity: 0;
+  }
+}
+
+/* Class to apply the highlight pseudo-element */
+.phase-card-active-highlight {
+  position: relative; /* Needed for absolute positioning of pseudo-element */
+  overflow: hidden;   /* Crucial to contain the pseudo-element's sweep */
+}
+
+.phase-card-active-highlight::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60%; /* Width of the highlight band */
+  height: 200%; /* Height to cover skewed element and its diagonal travel path */
+  /* Highlight color for dark text on light background: a subtle dark sheen */
+  /* background: rgba(18, 18, 18, 0.08); */
+  /* Or for light text on dark background: a subtle light sheen */
+  background: rgba(245, 245, 245, 0.3); /* Using a light sheen since text is #121212 on bg-white */
+  z-index: 0; /* Behind the content of .phase-card-active-highlight */
+  transform-origin: bottom left;
+  animation: sweep-highlight-diagonally 1.8s ease-in-out infinite;
+  animation-delay: 0.2s; /* slight delay so it doesn't start immediately */
+  pointer-events: none;
+}
+
+/* If you don't have tailwind.config.js extended for wiggle, 
+   you can force Tailwind to generate it with a utility class */
+/* Forcing Tailwind JIT compiler to recognize this animation */
+.animate-\[wiggle_1s_ease-in-out_infinite\] {
+  animation: wiggle 1s ease-in-out infinite;
+}
+
+/* Ensure fade-in-up and animate-fade-in are defined */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up.in-view {
+  animation: fadeInUp 0.7s ease-out forwards;
+}
+    
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
