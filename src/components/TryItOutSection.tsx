@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Card } // CardContent removed as it's not used
-from './ui/card';
+  from './ui/card';
 import { Button } from './ui/button';
 import { FileText } from 'lucide-react';
 import { ScrollArea } from './ui/scroll-area';
@@ -44,19 +44,17 @@ const TryItOutSection: React.FC = () => {
         observer.unobserve(currentSectionRef);
       }
     };
-  }, []); // Empty dependency array: runs once on mount for observer setup.
+  }, []);
 
-  // This useEffect handles the animation when TOGGLING back to the form card.
-  // It ensures the 'in-view' class is correctly applied to make the card visible and animate.
   useEffect(() => {
     if (!showMarkdown && formCardRef.current) {
       // The form card is being shown (either initially or after toggling back)
       const cardElement = formCardRef.current;
-      
+
       // To ensure CSS transitions replay, remove the 'active' class, force reflow, then re-add.
       cardElement.classList.remove('in-view');
       // Reading an offset property forces the browser to reflow/recalculate layout.
-      void cardElement.offsetWidth; 
+      void cardElement.offsetWidth;
       cardElement.classList.add('in-view');
     }
     // No 'else' branch needed here for 'showMarkdown === true' because:
@@ -81,26 +79,26 @@ ${tags ? `\n## Tags\n${tags.split(',').map(tag => `#${tag.trim()}`).join(' ')}` 
   };
 
   return (
-    <section 
+    <section
       id="try-it-out"
       ref={sectionRef}
       className="py-48 px-6 bg-[#121212] flex items-center justify-center relative z-10 min-h-screen" // Added min-h-screen for better centering if content is short
     >
       <ParticleBackground />
       {!showMarkdown ? (
-        <Card 
+        <Card
           ref={formCardRef} // Assign ref to the form card
           className="bg-[#F5F5F5] text-[#121212] rounded-lg shadow-2xl p-8 max-w-4xl w-full"
         >
           <h2 className="text-3xl font-semibold mb-10 text-center">
             Ready to Create Your First Script?
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div className="space-y-4">
               <div>
                 <label htmlFor="platform-select" className="block text-sm font-medium mb-1">Platform</label>
-                <select 
+                <select
                   id="platform-select"
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#121212]"
                   value={platform}
@@ -114,19 +112,19 @@ ${tags ? `\n## Tags\n${tags.split(',').map(tag => `#${tag.trim()}`).join(' ')}` 
                   <option value="other">Other</option>
                 </select>
               </div>
-              
+
               <div>
                 <label htmlFor="title-input" className="block text-sm font-medium mb-1">Title</label>
-                <Input 
+                <Input
                   id="title-input"
-                  placeholder="Enter video title..." 
+                  placeholder="Enter video title..."
                   className="px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#121212]"
                 />
               </div>
-              
+
               <div>
                 <label htmlFor="duration-select" className="block text-sm font-medium mb-1">Duration</label>
-                <select 
+                <select
                   id="duration-select"
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#121212]"
                 >
@@ -139,11 +137,11 @@ ${tags ? `\n## Tags\n${tags.split(',').map(tag => `#${tag.trim()}`).join(' ')}` 
                 </select>
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <div>
                 <label htmlFor="age-group-select" className="block text-sm font-medium mb-1">Age Group</label>
-                <select 
+                <select
                   id="age-group-select"
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#121212]"
                 >
@@ -155,24 +153,24 @@ ${tags ? `\n## Tags\n${tags.split(',').map(tag => `#${tag.trim()}`).join(' ')}` 
                   <option value="seniors">Seniors (45+)</option>
                 </select>
               </div>
-              
+
               <div>
                 <label htmlFor="tags-input" className="block text-sm font-medium mb-1">Tags</label>
-                <Input 
+                <Input
                   id="tags-input"
-                  placeholder="Enter tags separated by commas..." 
+                  placeholder="Enter tags separated by commas..."
                   className="px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#121212]"
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
                 />
               </div>
-              
+
               <div>
                 <label htmlFor="topic-input" className="block text-sm font-medium mb-1">Topic</label>
-                <Input 
+                <Input
                   id="topic-input"
-                  type="text" 
-                  placeholder="Enter your topic or idea here..." 
+                  type="text"
+                  placeholder="Enter your topic or idea here..."
                   className="px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#121212]"
                 />
               </div>
@@ -181,16 +179,16 @@ ${tags ? `\n## Tags\n${tags.split(',').map(tag => `#${tag.trim()}`).join(' ')}` 
 
           <div className="mb-6">
             <label htmlFor="additional-info-textarea" className="block text-sm font-medium mb-1">Additional Information</label>
-            <Textarea 
+            <Textarea
               id="additional-info-textarea"
-              placeholder="Add any specific requirements or details for your script..." 
+              placeholder="Add any specific requirements or details for your script..."
               className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#121212]"
               rows={4}
             />
           </div>
-          
+
           <div className="flex justify-center">
-            <button 
+            <button
               type="button"
               className="bg-[#121212] text-[#F5F5F5] px-8 py-4 rounded-md font-medium transition-all hover:bg-[#F5F5F5] hover:text-[#121212] hover:shadow-md hover:border-[#121212] border-2 border-[#121212] relative overflow-hidden group"
               onClick={handleGenerateScript}
@@ -199,15 +197,14 @@ ${tags ? `\n## Tags\n${tags.split(',').map(tag => `#${tag.trim()}`).join(' ')}` 
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.2)] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500 ease-in-out"></span>
             </button>
           </div>
-          
+
           <p className="text-gray-500 mt-6 text-sm text-center">
             No credit card required. Try it out instantly.
           </p>
         </Card>
       ) : (
-        <Card 
-          className="bg-[#F5F5F5] text-[#121212] rounded-lg shadow-2xl p-8 max-w-4xl w-full card-hover animate-fade-in"
-          // This card uses 'animate-fade-in' which should be a keyframe animation that plays on mount.
+        <Card
+          className="bg-[#F5F5F5] text-[#121212] rounded-lg shadow-2xl p-8 max-w-4xl w-full"
         >
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-3xl font-semibold">
@@ -217,29 +214,29 @@ ${tags ? `\n## Tags\n${tags.split(',').map(tag => `#${tag.trim()}`).join(' ')}` 
               </span>
             </h2>
             <div className="flex gap-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setIsEditing(!isEditing)}
                 className="border-2 border-[#121212] hover:bg-[#121212] hover:text-[#F5F5F5]"
               >
                 {isEditing ? "View Mode" : "Edit Mode"}
               </Button>
-              <Button 
+              {/* <Button 
                 variant="outline" 
                 onClick={handleBackToForm}
                 className="border-2 border-[#121212] hover:bg-[#121212] hover:text-[#F5F5F5]"
               >
                 Back to Form
-              </Button>
+              </Button> */}
             </div>
           </div>
-          
+
           <div className="bg-[#FDF7E9] border border-[#DEC99B] rounded-lg shadow-md overflow-hidden">
             <div className="border-b border-[#DEC99B] bg-[#F5EFD9] py-2 px-4 flex items-center justify-between">
               <div className="font-serif text-[#8A7356]">{platform.charAt(0).toUpperCase() + platform.slice(1)} Script</div>
               <div className="text-xs text-[#8A7356]">Created {new Date().toLocaleDateString()}</div>
             </div>
-            
+
             <ScrollArea className="h-[60vh] p-4 md:p-8 bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEX///////////////////////////////////////////////////////////////////////////////////////////94o5pzAAAAG3RSTlMAAQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRpAX7LzAAABPklEQVRIx9XW2a6DIBSG0W+AARK1zPP7P2lPT9LENgb3vWi8XMtE/gGAlZjUFkuRGsMwN9RxAiCitwJFP9VxAZCzu3e6XftVwe2ZxkXRqLqzPe4ADJ1pXBaNtonoPMBUMYm1vZ8AtmE5AFhKtZPk4wRwnA1cXXlHpTHVDUC9qz7o5wP3OgFYc0fe9U5TTpLlCGDI21IdpZpO2eyA+S2o1fJ+sEdgk9NIvX7O+NkdM0+l253cvzXvHVMmdmGtV8RTLsZHfGVEbNFnRKzWEhHrNUbERk0RsVmHv8Y/GHG6P3NH5l9oyJIaeYyM1MjAiLwYeWRk5sTIZOQ1kLXtOQwel2GMHFnvFA4DE+PoiHX4hMNgSIzcRsJhkPJGvi+6OF0gu+Ya9Yo/9GKQMIL5hLyRVz56A7Oph/3Zr/TiqeonAAAAAElFTkSuQmCC')]">
               {isEditing ? (
                 <Textarea
@@ -267,7 +264,7 @@ ${tags ? `\n## Tags\n${tags.split(',').map(tag => `#${tag.trim()}`).join(' ')}` 
                       </div>;
                     }
                     else if (!line.trim()) {
-                      return <div key={index} className="h-2"></div>; 
+                      return <div key={index} className="h-2"></div>;
                     }
                     else {
                       return <p key={index} className="mb-4">{line}</p>;
@@ -277,7 +274,7 @@ ${tags ? `\n## Tags\n${tags.split(',').map(tag => `#${tag.trim()}`).join(' ')}` 
               )}
             </ScrollArea>
           </div>
-          
+
 
           {/* Download button is disabled for now */}
           {/* <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-3">

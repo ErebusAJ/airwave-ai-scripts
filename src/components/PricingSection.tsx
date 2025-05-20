@@ -34,7 +34,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
       className={cn(
         // Base classes for all cards
         "bg-[#F5F5F5] text-[#121212] rounded-lg overflow-hidden fade-in-up flex flex-col relative",
-        "transition-all duration-300 ease-in-out", // For hover effects (scale, shadow)
+        "transition-all duration-100 ease-in-out",
 
         // Styling for different card types:
         {
@@ -149,52 +149,64 @@ const PricingSection: React.FC = () => {
             price="$0"
             features={[
               "5 scripts per month",
+              "Max 200 words per script",
               "3 voice-overs",
-              "Basic voices only",
-              "Standard support"
+              "1 minute of audio per script",
+              "English only",
+              "Basic voices",
             ]}
             cta="Get Started"
             delay={0}
             highlighted={true}
           />
           <PricingCard
-            plan="Starter"
-            price="$29"
+            plan="Influencer"
+            price="$20"
             features={[
-              "50 scripts per month",
-              "30 voice-overs",
+              "20 scripts per month",
+              "Max 500 words per script",
+              "5 voice-overs",
+              "3 minutes of audio per script",
               "10 premium voices",
-              "Email support"
+              "4 languages",
+              "Email support",
             ]}
-            cta="Choose Starter"
+            cta="Get Started"
             delay={150}
           />
           <PricingCard
             plan="Pro"
-            price="$79"
+            price="$50"
             features={[
-              "Unlimited scripts",
-              "100 voice-overs",
-              "All premium voices",
-              "Priority support"
+              "30 scripts per month",
+              "Max 800 words per script",
+              "10 voice-overs",
+              "5 minutes of audio per script",
+              "20 premium voices",
+              "10 languages",
+              "Priority support",
             ]}
-            cta="Choose Pro"
+            cta="Get Started"
             delay={300}
             popular={true}
           />
           <PricingCard
             plan="Enterprise"
-            price="Custom"
+            price="$80"
             features={[
-              "Unlimited everything",
-              "Custom voice cloning",
-              "API access",
-              "Dedicated support"
+              "100 scripts per month",
+              "Max 2000 words per script",
+              "15 voice-overs",
+              "10 minutes of audio per script",
+              "50 premium voices",
+              "20+ languages",
+              "Dedicated support",
             ]}
-            cta="Contact Sales"
+            cta="Get Started"
             delay={450}
           />
         </div>
+
       </div>
     </section>
   );
