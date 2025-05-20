@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import ParticleBackground from './ParticleBackground';
 
@@ -17,6 +16,12 @@ const HeroSection: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 bg-[#121212] overflow-hidden">
@@ -36,11 +41,17 @@ const HeroSection: React.FC = () => {
           Generate pro video scripts and instant AI voice-overs.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <button className="bg-[#F5F5F5] text-[#121212] px-8 py-3 rounded-md font-medium transition-all hover:bg-[#121212] hover:text-[#F5F5F5] hover:border-[#F5F5F5] border-2 border-[#F5F5F5]">
+          <button 
+            onClick={() => scrollToSection('try-it-out')}
+            className="bg-[#F5F5F5] text-[#121212] px-8 py-3 rounded-md font-medium transition-all hover:bg-[#121212] hover:text-[#F5F5F5] hover:border-[#F5F5F5] border-2 border-[#F5F5F5]"
+          >
             Try It Free
           </button>
-          <button className="border-2 border-[#F5F5F5] text-[#F5F5F5] px-8 py-3 rounded-md font-medium transition-all hover:bg-[#F5F5F5] hover:text-[#121212]">
-            See Demo
+          <button 
+            onClick={() => scrollToSection('sign-up')}
+            className="border-2 border-[#F5F5F5] text-[#F5F5F5] px-8 py-3 rounded-md font-medium transition-all hover:bg-[#F5F5F5] hover:text-[#121212]"
+          >
+            Beta Signup
           </button>
         </div>
       </div>

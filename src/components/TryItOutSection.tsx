@@ -82,6 +82,7 @@ ${tags ? `\n## Tags\n${tags.split(',').map(tag => `#${tag.trim()}`).join(' ')}` 
 
   return (
     <section 
+      id="try-it-out"
       ref={sectionRef}
       className="py-48 px-6 bg-[#121212] flex items-center justify-center relative z-10 min-h-screen" // Added min-h-screen for better centering if content is short
     >
@@ -89,9 +90,7 @@ ${tags ? `\n## Tags\n${tags.split(',').map(tag => `#${tag.trim()}`).join(' ')}` 
       {!showMarkdown ? (
         <Card 
           ref={formCardRef} // Assign ref to the form card
-          className="bg-[#F5F5F5] text-[#121212] rounded-lg shadow-2xl p-8 max-w-4xl w-full fade-in-up card-hover"
-          // The 'fade-in-up' class sets initial opacity: 0 / transform.
-          // The 'in-view' class (added by useEffects) triggers the transition to opacity: 1 / normal transform.
+          className="bg-[#F5F5F5] text-[#121212] rounded-lg shadow-2xl p-8 max-w-4xl w-full"
         >
           <h2 className="text-3xl font-semibold mb-10 text-center">
             Ready to Create Your First Script?

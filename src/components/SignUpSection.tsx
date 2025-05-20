@@ -62,7 +62,7 @@ const SignUpSection: React.FC = () => {
   };
 
   return (
-    <section className="py-16 px-6 bg-white">
+    <section className="py-16 px-6 bg-white" id="sign-up">
       <div className="container mx-auto max-w-3xl text-center">
         <h2 className="text-3xl font-semibold mb-6 text-black">Join 500+ Creators in Beta</h2>
         <p className="text-gray-600 mb-8">Be among the first to access our full suite of AI script and voice tools.</p>
