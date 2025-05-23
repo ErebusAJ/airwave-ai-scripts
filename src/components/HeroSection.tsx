@@ -38,7 +38,7 @@ const HeroSection: React.FC = () => {
           From Idea to Airwaves in One Click.
         </h1>
         <p className="text-gray-400 text-lg md:text-xl mb-10">
-          Generate pro video scripts and instant AI voice-overs.
+          {/* Generate pro video scripts and instant AI voice-overs. */}
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <button 

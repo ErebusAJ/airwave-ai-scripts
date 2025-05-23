@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,98 +10,96 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, UserPlus } from "lucide-react";
 
 const LoginDialog = () => {
   const [open, setOpen] = useState(false);
 
+  const handleSignUpBetaClick = () => {
+    setOpen(false);
+    // Use a short timeout to allow the dialog to start closing before scrolling.
+    // This can help make the transition smoother.
+    setTimeout(() => {
+      const betaSection = document.getElementById("sign-up");
+      if (betaSection) {
+        betaSection.scrollIntoView({ behavior: "smooth" });
+      } else {
+        // Log a warning if the target section is not found
+        console.warn(
+          "Element with ID 'beta-signup-section' not found. Cannot scroll to beta sign up."
+        );
+      }
+    }, 150); // 150ms delay, adjust if needed
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-[#F5F5F5] text-[#121212] px-4 py-2 rounded hover:bg-opacity-90 transition-all">
+        <Button
+          className="bg-[#F5F5F5] text-[#121212] px-8 py-3 rounded-md font-medium transition-all hover:bg-[#121212] hover:text-[#F5F5F5] hover:border-[#F5F5F5] border-2 border-[#F5F5F5]"
+        >
           Login
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-[#121212] text-[#F5F5F5] border border-[#333]">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold text-center">Welcome</DialogTitle>
-          <DialogDescription className="text-center text-gray-400">
-            Sign in to your account or create a new one
+          {/* Updated title and description for login-only */}
+          <DialogTitle className="text-2xl font-semibold text-center">
+            Login
+          </DialogTitle>
+          <DialogDescription className="text-center text-gray-400 pt-1"> {/* Optional: Added pt-1 for slight space from title */}
+            Access your account to continue.
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="login" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6 bg-[#222]">
-            <TabsTrigger value="login" className="data-[state=active]:bg-[#333] data-[state=active]:text-[#F5F5F5]">
-              <User className="mr-2 h-4 w-4" />
-              Login
-            </TabsTrigger>
-            <TabsTrigger value="signup" className="data-[state=active]:bg-[#333] data-[state=active]:text-[#F5F5F5]">
-              <UserPlus className="mr-2 h-4 w-4" />
-              Sign Up
-            </TabsTrigger>
-          </TabsList>
+        {/* 
+          Form content container.
+          "pt-6" provides top padding, separating it from the DialogHeader.
+          "space-y-4" provides vertical spacing between major form blocks.
+        */}
+        <div className="pt-6 space-y-4">
+          <div className="space-y-2"> {/* Email input block */}
+            <Label htmlFor="email-login" className="text-[#F5F5F5]">
+              Email
+            </Label>
+            <Input
+              id="email-login"
+              placeholder="Email address"
+              className="bg-[#222] border-[#333] text-[#F5F5F5]"
+              type="email" // Added type="email" for better semantics
+            />
+          </div>
 
-          <TabsContent value="login" className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-[#F5F5F5]">Email</Label>
-              <Input
-                id="email"
-                placeholder="Email address"
-                className="bg-[#222] border-[#333] text-[#F5F5F5]"
-              />
+          <div className="space-y-2"> {/* Password input block */}
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password-login" className="text-[#F5F5F5]">
+                Password
+              </Label>
+              <Button variant="link" className="text-xs text-[#9b87f5] p-0 h-auto"> {/* h-auto to ensure proper sizing */}
+                Forgot password?
+              </Button>
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-[#F5F5F5]">Password</Label>
-                <Button variant="link" className="text-xs text-[#9b87f5] p-0">
-                  Forgot password?
-                </Button>
-              </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                className="bg-[#222] border-[#333] text-[#F5F5F5]"
-              />
-            </div>
-            <Button className="w-full bg-[#F5F5F5] text-[#121212] hover:animate-shine animate-shine hover:bg-[#F5F5F5]">
-              Sign In
-            </Button>
-          </TabsContent>
+            <Input
+              id="password-login"
+              type="password"
+              placeholder="Enter your password"
+              className="bg-[#222] border-[#333] text-[#F5F5F5]"
+            />
+            {/* Action text added below password input */}
+            <p
+              className="text-xs text-center text-[#9b87f5] cursor-pointer hover:underline"
+              onClick={handleSignUpBetaClick}
+            >
+              Don't have an account? Sign up for beta here!
+            </p>
+          </div>
 
-          <TabsContent value="signup" className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="signup-name" className="text-[#F5F5F5]">Full Name</Label>
-              <Input
-                id="signup-name"
-                placeholder="Enter your name"
-                className="bg-[#222] border-[#333] text-[#F5F5F5]"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="signup-email" className="text-[#F5F5F5]">Email</Label>
-              <Input
-                id="signup-email"
-                placeholder="Email address"
-                className="bg-[#222] border-[#333] text-[#F5F5F5]"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="signup-password" className="text-[#F5F5F5]">Password</Label>
-              <Input
-                id="signup-password"
-                type="password"
-                placeholder="Create a password"
-                className="bg-[#222] border-[#333] text-[#F5F5F5]"
-              />
-            </div>
-            <Button className="w-full bg-[#F5F5F5] text-[#121212] hover:animate-shine animate-shine hover:bg-[#F5F5F5]">
-              Create Account
-            </Button>
-          </TabsContent>
-        </Tabs>
+          <Button
+            type="submit" // Good practice for form buttons
+            className="w-full bg-[#F5F5F5] text-[#121212] hover:animate-shine animate-shine hover:bg-[#F5F5F5]"
+          >
+            Sign In
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
