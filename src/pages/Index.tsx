@@ -20,13 +20,13 @@ const Index = () => {
         threshold: 0.1,
         rootMargin: "0px 0px -100px 0px"
       };
-  
+
       // Create observer for fade-up animations
       const fadeObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             entry.target.classList.add("in-view");
-            
+
             // Add a slight delay based on index for child elements if needed
             if (entry.target.hasAttribute('data-stagger')) {
               const children = entry.target.children;
@@ -35,12 +35,12 @@ const Index = () => {
                 child.classList.add('in-view');
               });
             }
-            
+
             fadeObserver.unobserve(entry.target);
           }
         });
       }, observerOptions);
-  
+
       // Find all elements with data-scroll attribute
       const scrollElements = document.querySelectorAll('[data-scroll]');
       scrollElements.forEach(el => {
@@ -57,7 +57,7 @@ const Index = () => {
       const handleParallax = () => {
         const parallaxElements = document.querySelectorAll('[data-parallax]');
         const scrollY = window.scrollY;
-        
+
         parallaxElements.forEach(element => {
           const speed = parseFloat(element.getAttribute('data-parallax-speed') || '0.2');
           const offset = scrollY * speed;
@@ -67,7 +67,7 @@ const Index = () => {
 
       // Add scroll listener for parallax
       window.addEventListener('scroll', handleParallax, { passive: true });
-      
+
       // Initial call to set positions
       handleParallax();
 
