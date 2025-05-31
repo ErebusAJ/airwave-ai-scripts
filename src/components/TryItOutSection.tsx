@@ -105,27 +105,48 @@ const TryItOutSection: React.FC = () => {
     setTimeout(processNextStep, stepDuration);
   };
 
+  // Generate script content using the API
   const generateScriptContent = async () => {
     const finalPrompt = customPrompt.trim() ? customPrompt.trim() : "";
     const requestBody = {
-      platform, title, duration: duration[0], prompt: finalPrompt, age_group: ageGroup, tags: selectedTags.join(', '),
+      platform, 
+      title, 
+      duration: duration[0], 
+      prompt: finalPrompt, 
+      age_group: ageGroup, 
+      tags: selectedTags.join(', '),
     };
+
     try {
-      // MOCK API CALL
-      await new Promise(resolve => setTimeout(resolve, 2500));
-      const scriptFromApi = `This is a mock script for ${title} on ${platform} for ${ageGroup}, ${duration[0]} mins. Tags: ${selectedTags.join(', ')}. Prompt: ${finalPrompt || "None"}`;
-      setGeneratedScript(scriptFromApi);
+      const response = await fetch('http://localhost:8080/v1/beta/script/gen', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setGeneratedScript(data.script);
       setGenerationStep(scriptGenerationStepsLength + 1);
+      
       setTimeout(() => {
         setShowMarkdown(true);
         setIsGenerating(false);
         setGenerationStep(0);
       }, 700);
+
     } catch (error) {
       console.error('Failed to fetch script:', error);
-      alert('An unexpected error occurred.');
       setIsGenerating(false);
       setGenerationStep(0);
+      
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      alert(errorMessage);
     }
   };
 
