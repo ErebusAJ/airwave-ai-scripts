@@ -38,11 +38,10 @@ const AudienceDurationCard: React.FC<AudienceDurationCardProps> = ({
                 key={age}
                 onClick={() => onAgeGroupChange(age)}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-all w-full
-                                    ${
-                                      ageGroup === age
-                                        ? 'bg-[#121212] text-[#F5F5F5]'
-                                        : 'bg-gray-200 text-[#121212] hover:bg-gray-300'
-                                    }`}
+                                    ${ageGroup === age
+                    ? 'bg-[#121212] text-[#F5F5F5]'
+                    : 'bg-gray-200 text-[#121212] hover:bg-gray-300'
+                  }`}
               >
                 {age}
               </button>
@@ -56,13 +55,13 @@ const AudienceDurationCard: React.FC<AudienceDurationCardProps> = ({
           </label>
           <Slider
             defaultValue={duration}
-            max={15}
+            max={5}
             min={1}
-            step={1}
+            step={.5}
             onValueChange={onDurationChange}
             className="w-full [&>span:first-child]:h-2 [&>span:first-child>span]:h-2 [&>span:last-child]:h-5 [&>span:last-child]:w-5"
           />
-          <p className="text-xs text-gray-500 mt-1">Slider for 1 to 15 minutes.</p>
+          <p className="text-xs text-gray-500 mt-1">Slider for 1 to 5 minutes.</p>
         </div>
       </div>
 

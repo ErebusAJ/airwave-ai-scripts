@@ -132,23 +132,30 @@
 /* In your global CSS file (e.g., src/index.css or src/globals.css) */
 /* Remove or comment out the old soundwave-bar-animation keyframes */
 
-@keyframes soundwave-bar-animation {
-  0%, 100% { transform: scaleY(0.05); } /* Start and end low */
-  10% { transform: scaleY(0.3); }
-  20% { transform: scaleY(0.15); }
-  30% { transform: scaleY(0.6); }
-  40% { transform: scaleY(0.25); }
-  50% { transform: scaleY(0.85); } /* Peak */
-  60% { transform: scaleY(0.4); }
-  70% { transform: scaleY(0.95); } /* Near peak */
-  80% { transform: scaleY(0.5); }
-  90% { transform: scaleY(0.7); }
+/* In your global CSS file (e.g., globals.css) */
+@keyframes soundWave {
+  0%, 100% {
+    transform: scaleY(0.1); /* Min height */
+  }
+  25% {
+    transform: scaleY(0.6);
+  }
+  50% {
+    transform: scaleY(1); /* Max height */
+  }
+  75% {
+    transform: scaleY(0.3);
+  }
 }
 
-.soundwave-bar-animate {
-  height: 100%; /* Bars scale relative to their parent's height (set by maxHeight prop) */
-  animation-name: soundwave-bar-animation;
-  animation-timing-function: ease-in-out; 
+.soundwave-bar {
+  transform-origin: bottom; /* Animation scales from the bottom */
+  transition: transform 0.2s ease-out; /* Smooth transition for stopping/starting */
+}
+
+.soundwave-bar.playing {
+  animation-name: soundWave;
+  animation-timing-function: linear; /* Or ease-in-out for smoother peaks */
   animation-iteration-count: infinite;
-  transform-origin: bottom; /* Ensures bars scale upwards from their base */
+  /* animation-direction: alternate; */ /* Optional: makes it go up and down more smoothly */
 }
