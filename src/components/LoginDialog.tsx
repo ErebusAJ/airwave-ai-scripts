@@ -95,7 +95,7 @@ const LoginDialog = () => {
 
           <Button
             type="submit" // Good practice for form buttons
-            className="w-full bg-[#F5F5F5] text-[#121212] hover:animate-shine animate-shine hover:bg-[#F5F5F5]"
+            className="w-full bg-[#F5F5F5] text-[#121212] hover:bg-[#121212] hover:text-[#F5F5F5] border-2 border-[#F5F5F5] transition-colors"
           >
             Sign In
           </Button>

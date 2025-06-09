@@ -1,4 +1,5 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
+import { Loader2 } from 'lucide-react';
 
 const useCaseOptions = ['YouTube', 'TikTok', 'Instagram', 'LinkedIn', 'Website', 'Other'];
 
@@ -23,6 +24,7 @@ const SignUpSection: React.FC = () => {
   const [otherUseCase, setOtherUseCase] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleUseCaseChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -52,12 +54,14 @@ const SignUpSection: React.FC = () => {
 
     const finalUseCase = useCase === 'Other' ? otherUseCase.trim() : useCase;
 
+    setIsLoading(true);
     try {
       await submitSignUpData(email, finalUseCase);
       setIsSubmitted(true);
     } catch (err) {
       console.error('Submission error:', err);
       setError('Failed to sign up. Please try again.');
+      setIsLoading(false);
     }
   };
 
@@ -66,7 +70,7 @@ const SignUpSection: React.FC = () => {
       <div className="container mx-auto max-w-3xl text-center">
         <h2 className="text-3xl font-semibold mb-6 text-black">Join 500+ Creators in Beta</h2>
         <p className="text-gray-600 mb-8">Be among the first to access our full suite of AI script and voice tools.</p>
-        
+
         {isSubmitted ? (
           <div className="flex flex-col items-center">
             <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4">
@@ -108,11 +112,19 @@ const SignUpSection: React.FC = () => {
               />
             )}
             {error && <p className="text-red-500 text-sm mt-2 text-left">{error}</p>}
-            <button 
+            <button
               type="submit"
-              className="bg-black text-white px-8 py-3 rounded-md font-medium transition-all hover:bg-white hover:text-black hover:border-black border-2 border-black w-full sm:w-auto mt-2"
+              disabled={isLoading}
+              className="bg-black text-white px-8 py-3 rounded-md font-medium transition-all hover:bg-white hover:text-black hover:border-black border-2 border-black w-full sm:w-auto mt-2 flex items-center justify-center disabled:bg-gray-600 disabled:cursor-not-allowed"
             >
-              Sign Up
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Signing Up...
+                </>
+              ) : (
+                'Sign Up'
+              )}
             </button>
           </form>
         )}

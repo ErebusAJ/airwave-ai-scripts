@@ -15,7 +15,7 @@ const Navbar: React.FC = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 py-4 px-6 md:px-12 bg-[#121212]">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center">
-          <Link to="/" className="text-[#F5F5F5] font-bold text-2xl">....</Link>
+          <Link to="/" className="text-[#F5F5F5] font-bold text-2xl">ScriptEcho</Link>
 
           <div className="hidden md:flex items-center justify-center space-x-8 flex-1">
             <Link to="/" className="text-[#F5F5F5] hover:text-gray-300 transition-colors">Features</Link>
