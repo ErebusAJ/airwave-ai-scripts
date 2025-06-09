@@ -12,10 +12,12 @@ import AdditionalInstructionCard from './try-it-out/AdditionalInstructionCard';
 import ScriptGenerationLoading from './try-it-out/ScriptGenerationLoading';
 import GeneratedScriptDisplay from './try-it-out/GeneratedScriptDisplay';
 import AIVoiceOverFlow from './try-it-out/AIVoiceOverFlow';
+import { ErrorProvider, useError } from '../context/ErrorContext';
+import ApiError from './ui/ApiError';
 
 const scriptGenerationStepsLength = 3;
 
-const TryItOutSection: React.FC = () => {
+const TryItOutContent: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [currentStep, setCurrentStep] = useState(1);
@@ -41,6 +43,7 @@ const TryItOutSection: React.FC = () => {
   const [voiceOverAudioBlob, setVoiceOverAudioBlob] = useState<Blob | null>(null);
   const audioPlayerRef = useRef<HTMLAudioElement>(null);
   const [isAudioActuallyPlaying, setIsAudioActuallyPlaying] = useState(false);
+  const { showError } = useError(); // Get the showError function from context
 
   const activeBlobUrlRef = useRef<string | null>(null);
 
@@ -111,7 +114,7 @@ const TryItOutSection: React.FC = () => {
       platform, title, duration: duration[0], prompt: finalPrompt, age_group: ageGroup, tags: selectedTags.join(', '),
     };
     try {
-      const response = await fetch('http://localhost:8080/v1/beta/script/gen', {
+      const response = await fetch('https://scriptecho.onrender.com/v1/beta/script/gen', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody)
@@ -133,7 +136,7 @@ const TryItOutSection: React.FC = () => {
       setIsGenerating(false);
       setGenerationStep(0);
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-      alert(`Error generating script: ${errorMessage}`);
+      showError(`Error generating script: We're currently experiencing high demand. Please try again later.`);
     }
   };
 
@@ -144,15 +147,16 @@ const TryItOutSection: React.FC = () => {
     setSpeakableTextForVO(""); // Clear previous
 
     if (!generatedScript) {
-      console.error("Cannot prepare speakable text: generatedScript is empty.");
-      setSpeakableTextForVO("Error: Original script is missing. Please generate a script first.");
-      setAiVoiceOverState('ready'); // Or 'error'
+      const msg = "Cannot prepare speakable text: original script is empty.";
+      console.error(msg);
+      showError(msg);
+      setAiVoiceOverState('error');
       return;
     }
     console.log("Requesting speakable text for AI Voice Over from original script:", generatedScript.substring(0, 100) + "...");
 
     try {
-      const response = await fetch('http://localhost:8080/v1/beta/script/text', {
+      const response = await fetch('https://scriptecho.onrender.com/v1/beta/script/text', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ script: generatedScript }), // Send the markdown script
@@ -189,18 +193,18 @@ const TryItOutSection: React.FC = () => {
     } catch (error) {
       console.error("Prepare Speakable Text API Error:", error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error during speakable text preparation';
-      setSpeakableTextForVO(`Error loading speakable text: ${errorMessage}`);
+      showError(errorMessage);
       setAiVoiceOverState('ready'); // Display error in AIVoiceOverFlow's textarea
     }
   };
 
   // Generates audio from the (edited) speakable text
   // In TryItOutSection.tsx
-  const TTS_AUDIO_GENERATION_ENDPOINT = 'http://localhost:8080/v1/beta/tts/trial/9BWtsMINqrJLrRacOk9x'; // Ensure this is correct
+  const TTS_AUDIO_GENERATION_ENDPOINT = 'https://scriptecho.onrender.com/v1/beta/tts/trial/9BWtsMINqrJLrRacOk9x'; // Ensure this is correct
 
   const handleGenerateAudioFromSpeakableText = async (textToSpeak: string) => {
     if (!textToSpeak.trim()) {
-      alert("No text available to generate audio.");
+      showError("Cannot generate audio from empty text.");
       setAiVoiceOverState('ready');
       return;
     }
@@ -266,7 +270,7 @@ const TryItOutSection: React.FC = () => {
 
     } catch (error) {
       console.error("AUDIO_GEN: CATCH BLOCK - Error:", error);
-      alert(`Error generating audio: ${error instanceof Error ? error.message : String(error)}`);
+      // const errorMessage = error instanceof Error ? error.message : String(error);
       setAiVoiceOverState('error');
       setVoiceOverAudioBlob(null);
     }
@@ -278,6 +282,7 @@ const TryItOutSection: React.FC = () => {
       if (audioPlayerRef.current.paused || audioPlayerRef.current.ended) {
         audioPlayerRef.current.play().catch(e => {
           console.error("Error playing audio:", e);
+          showError("Could not play audio. The file may be corrupt or unsupported.");
           setAiVoiceOverState('error');
         });
       } else {
@@ -392,6 +397,15 @@ const TryItOutSection: React.FC = () => {
         />
       ) : null}
     </section>
+  );
+};
+
+const TryItOutSection: React.FC = () => {
+  return (
+    <ErrorProvider>
+      <TryItOutContent />
+      <ApiError />
+    </ErrorProvider>
   );
 };
 

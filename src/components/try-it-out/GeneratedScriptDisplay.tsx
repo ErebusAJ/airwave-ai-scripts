@@ -30,7 +30,10 @@ const GeneratedScriptDisplay: React.FC<GeneratedScriptDisplayProps> = ({
   onStartAIVoiceOver,
 }) => {
   const handleDownload = () => {
-    const blob = new Blob([generatedScript], { type: 'text/markdown;charset=utf-8' });
+    // When downloading, we should download the version that renders correctly,
+    // so we process it first to remove potential fences.
+    const contentToDownload = preprocessScriptText(generatedScript, true); // Pass true to only strip fences for download
+    const blob = new Blob([contentToDownload], { type: 'text/markdown;charset=utf-8' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `${title || 'generated-script'}.md`;
@@ -43,35 +46,59 @@ const GeneratedScriptDisplay: React.FC<GeneratedScriptDisplayProps> = ({
   // Define custom renderers for Markdown elements
   const markdownComponents = {
     h1: ({ node, ...props }: any) => <h1 className="text-2xl font-semibold mt-4 mb-2 text-[#33302E]" {...props} />,
-    h2: ({ node, ...props }: any) => <h2 className="text-xl font-semibold mt-3 mb-1.5 text-[#33302E]" {...props} />, // Matched image style for "Visit to Taj Hotel"
-    h3: ({ node, ...props }: any) => <h3 className="text-lg font-semibold mt-2 mb-1 text-[#33302E]" {...props} />, // Matched image style for "Arrival", "Lobby"
-    p: ({ node, ...props }: any) => <p className="mb-2 leading-relaxed text-[#33302E]" {...props} />, // For script-like line spacing
-    strong: ({ node, ...props }: any) => <strong className="font-semibold text-[#33302E]" {...props} />, // To ensure bold is consistent
+    h2: ({ node, ...props }: any) => <h2 className="text-xl font-semibold mt-3 mb-1.5 text-[#33302E]" {...props} />,
+    h3: ({ node, ...props }: any) => <h3 className="text-lg font-semibold mt-2 mb-1 text-[#33302E]" {...props} />,
+    p: ({ node, ...props }: any) => <p className="mb-2 leading-relaxed text-[#33302E]" {...props} />,
+    strong: ({ node, ...props }: any) => <strong className="font-semibold text-[#33302E]" {...props} />,
     em: ({ node, ...props }: any) => <em className="italic text-[#33302E]" {...props} />,
-    // You can add more custom renderers for ul, ol, li, blockquote, etc. if needed
+    ul: ({ node, ...props }: any) => <ul className="list-disc list-inside mb-2 ml-4 text-[#33302E]" {...props} />,
+    li: ({ node, ...props }: any) => <li className="mb-1" {...props} />,
   };
 
-  // A simple pre-processor to enhance script-like text for Markdown
-  // This is a basic example. More sophisticated parsing might be needed for complex cases.
-  const preprocessScriptText = (text: string): string => {
-    return text
+  /**
+   * Pre-processes the script text.
+   * 1. Strips outer ```markdown ... ``` fences if present.
+   * 2. Optionally bolds lines like "Narrator (Voiceover):" (if not in stripFencesOnly mode).
+   * @param text The script text to process.
+   * @param stripFencesOnly If true, only performs step 1. Defaults to false.
+   * @returns The processed script text.
+   */
+  const preprocessScriptText = (text: string, stripFencesOnly: boolean = false): string => {
+    let processed = text;
+
+    const fenceRegex = /^```(?:markdown\s*|[a-zA-Z0-9]+\s*)?\n([\s\S]*?)\n```[\s]*$/;
+    const match = processed.match(fenceRegex);
+
+    if (match && match[1]) {
+      processed = match[1];
+    }
+
+    if (stripFencesOnly) {
+      return processed;
+    }
+
+    // 2. Apply other line-by-line transformations (e.g., bolding Narrator)
+    return processed
       .split('\n')
       .map(line => {
-        // Example: If a line is short, not starting with [ or ", and followed by a line with " or [, treat it as a heading
-        // This is very heuristic and might need refinement.
-        // For simplicity, let's assume your API can provide ## or ### for headings.
-        // If you absolutely need to infer headings from plain text, this part needs more complex logic.
-
-        // Make lines like "Narrator (Voiceover):" bold if not already
-        if (line.match(/^[A-Za-z0-9\s]+(\s\(.*\))?:/) && !line.startsWith('**')) {
-            return `**${line.trim()}**`;
+        // Make lines like "Narrator (Voiceover):" or "Narrator:" bold if not already
+        // This regex looks for a potential speaker name (alphanumeric, spaces)
+        // followed by optional (parentheses content) and a colon.
+        if (line.match(/^[A-Za-z0-9\s]+(\s*\(.*?\))?:\s*/) && !line.startsWith('**')) {
+            const parts = line.split(':');
+            const speakerPart = parts.shift(); // The part before the first colon
+            const restOfLine = parts.join(':'); // Everything after the first colon
+            if (speakerPart) {
+              return `**${speakerPart.trim()}:**${restOfLine}`;
+            }
         }
         return line;
       })
       .join('\n');
   };
 
-  const processedScript = preprocessScriptText(generatedScript);
+  // For display, run the full preprocessing (strip fences AND apply other transformations)
+  const scriptToRender = preprocessScriptText(generatedScript);
 
   return (
     <Card className="bg-[#F5F5F5] text-[#121212] rounded-xl shadow-2xl p-6 sm:p-8 max-w-4xl w-full animate-fade-in z-20
@@ -109,26 +136,24 @@ const GeneratedScriptDisplay: React.FC<GeneratedScriptDisplayProps> = ({
         <ScrollArea className="h-0 flex-grow bg-[url('data:image/png;base64,...')]"> {/* Ensure this background URL is correct or remove if not needed */}
           {isEditing ? (
             <Textarea
-              value={generatedScript} // Edit the raw script
+              value={generatedScript} // Edit the raw script (including fences if they came from API)
               onChange={(e) => onGeneratedScriptChange(e.target.value)}
               className="w-full h-full p-4 md:p-6 bg-transparent text-[#33302E] font-serif text-base leading-relaxed resize-none focus:outline-none focus:ring-0 border-none"
               placeholder="Edit your script here..."
             />
           ) : (
             <div className="p-4 md:p-6 prose prose-sm sm:prose-base max-w-none 
-                            prose-headings:font-serif prose-headings:text-[#33302E] prose-strong:text-[#33302E] prose-em:text-[#33302E] prose-p:text-[#33302E] prose-p:leading-relaxed prose-p:mb-2">
+                            prose-headings:font-serif prose-headings:text-[#33302E] 
+                            prose-strong:text-[#33302E] prose-em:text-[#33302E] 
+                            prose-p:text-[#33302E] prose-p:leading-relaxed prose-p:mb-2
+                            prose-ul:list-disc prose-ul:list-inside prose-ul:mb-2 prose-ul:ml-4 prose-ul:text-[#33302E]
+                            prose-li:mb-1 prose-li:text-[#33302E]">
               <ReactMarkdown
                 components={markdownComponents}
                 remarkPlugins={[remarkGfm]}
               >
-                {/* It's better if API provides proper Markdown.
-                    If not, the processedScript might help, but true Markdown is more robust.
-                    For now, let's assume generatedScript contains the Markdown.
-                    If your API truly sends plain text that needs to look like Markdown,
-                    the 'preprocessScriptText' function needs to be much more robust
-                    at converting plain text patterns into Markdown syntax.
-                */}
-                {generatedScript || "No script generated yet. Ensure the API returns valid Markdown for best results."}
+                {/* Render the script AFTER preprocessing (which removes fences and may bold narrators) */}
+                {scriptToRender || "No script generated yet. Ensure the API returns valid Markdown for best results."}
               </ReactMarkdown>
             </div>
           )}
@@ -159,4 +184,4 @@ const GeneratedScriptDisplay: React.FC<GeneratedScriptDisplayProps> = ({
   );
 };
 
-export default GeneratedScriptDisplay;
+export default GeneratedScriptDisplay;  

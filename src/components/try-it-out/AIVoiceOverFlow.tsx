@@ -274,7 +274,7 @@ const AIVoiceOverFlow: React.FC<AIVoiceOverFlowProps> = ({
         <div className="flex flex-col items-center justify-center flex-grow space-y-4 text-red-600">
           <Info size={48} />
           <p className="text-xl font-medium">Voice-Over Process Failed</p>
-          <p className="text-sm text-center">An error occurred. Please try again or go back to the script.</p>
+          <p className="text-sm text-center">We are currently experiencing high demand. Please try again later.</p>
           <div className="flex gap-3 mt-4">
             <Button
               variant="outline"

@@ -1,11 +1,13 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useError, ErrorProvider } from '../context/ErrorContext'; // Adjusted path
+import ApiError from './ui/ApiError'; // Import the display component
 
 const useCaseOptions = ['YouTube', 'TikTok', 'Instagram', 'LinkedIn', 'Website', 'Other'];
 
 // Function to simulate API call
 async function submitSignUpData(email: string, useCaseDetails: string): Promise<void> {
-  const response = await fetch('http://localhost:8080/v1/beta/access', {
+  const response = await fetch('https://scriptecho.onrender.com/v1/beta/access', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -13,42 +15,45 @@ async function submitSignUpData(email: string, useCaseDetails: string): Promise<
     body: JSON.stringify({ email, use_case: useCaseDetails }),
   });
   if (!response.ok) {
-    throw new Error('Sign up failed');
+    // Try to parse a meaningful error message from the backend
+    const errorData = await response.json().catch(() => ({}));
+    const message = errorData.message || 'Sign up failed due to a server error.';
+    throw new Error(message);
   }
-  console.log('Sign up successful');
 }
 
-const SignUpSection: React.FC = () => {
+const SignUpContent: React.FC = () => {
   const [email, setEmail] = useState('');
   const [useCase, setUseCase] = useState('');
   const [otherUseCase, setOtherUseCase] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { showError } = useError(); // Use the global error handler for API errors
 
   const handleUseCaseChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setUseCase(value);
     if (value !== 'Other') {
       setOtherUseCase(''); // Clear otherUseCase if a predefined option is selected
-      setError(null); // Clear error related to other use case
+      setValidationError(null); // Clear error related to other use case
     }
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError(null); // Clear previous errors
+    setValidationError(null); // Clear previous validation errors
 
     if (!email) {
-      setError('Email is required.');
+      setValidationError('Email is required.');
       return;
     }
     if (!useCase) {
-      setError('Please select a use case.');
+      setValidationError('Please select a use case.');
       return;
     }
     if (useCase === 'Other' && !otherUseCase.trim()) {
-      setError('Please specify your use case.');
+      setValidationError('Please specify your use case.');
       return;
     }
 
@@ -60,7 +65,8 @@ const SignUpSection: React.FC = () => {
       setIsSubmitted(true);
     } catch (err) {
       console.error('Submission error:', err);
-      setError('Failed to sign up. Please try again.');
+      // Use the global, themed error prompt for API errors
+      showError(err instanceof Error ? err.message : 'An unknown error occurred.');
       setIsLoading(false);
     }
   };
@@ -111,7 +117,7 @@ const SignUpSection: React.FC = () => {
                 onChange={(e) => setOtherUseCase(e.target.value)}
               />
             )}
-            {error && <p className="text-red-500 text-sm mt-2 text-left">{error}</p>}
+            {validationError && <p className="text-red-500 text-sm mt-2 text-left">{validationError}</p>}
             <button
               type="submit"
               disabled={isLoading}
@@ -132,5 +138,14 @@ const SignUpSection: React.FC = () => {
     </section>
   );
 };
+
+const SignUpSection: React.FC = () => {
+  return (
+    <ErrorProvider>
+      <SignUpContent />
+      <ApiError />
+    </ErrorProvider>
+  )
+}
 
 export default SignUpSection;

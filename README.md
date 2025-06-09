@@ -1,73 +1,47 @@
-# Welcome to your Lovable project
+# ScriptEcho
 
-## Project info
+Welcome to ScriptEcho, an AI-powered platform designed to revolutionize the creative workflow for influencers and content creators. Our mission is to streamline the content creation process, from initial idea to final audio, allowing creators to focus on what they do best: creating.
 
-**URL**: https://lovable.dev/projects/5984185c-c31d-40e1-92a7-cafa6296d87d
+## Core Idea
 
-## How can I edit this code?
+ScriptEcho empowers creators by providing a seamless, two-step process for content generation:
 
-There are several ways of editing your application.
+1.  **AI Script Generation:** Users can input a title, platform, target audience, and other details to generate high-quality, engaging scripts tailored to their specific needs.
+2.  **AI Voice-Overs:** Once a script is finalized, creators can instantly generate a realistic AI voice-over, transforming the text into ready-to-use audio.
 
-**Use Lovable**
+This project is currently in **Beta**.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5984185c-c31d-40e1-92a7-cafa6296d87d) and start prompting.
+## Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+ScriptEcho is built with a modern and robust technology stack, ensuring a scalable and efficient platform.
 
-**Use your preferred IDE**
+### Backend
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+*   **Language:** Go (Golang)
+*   **Database:** PostgreSQL
+*   **Caching:** Redis
+*   **Deployment:** The backend is currently hosted on [Render](https://render.com/).
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Frontend
 
-Follow these steps:
+*   **Framework:** React (with TypeScript)
+*   **Styling:** Tailwind CSS
+*   **UI Components:** Built using the fantastic `shadcn/ui` library.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Getting Started
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+To get a local copy up and running, follow these simple steps.
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Prerequisites
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+*   Node.js (v18 or later recommended)
+*   `npm`, `pnpm`, or `yarn` package manager
+*   A running instance of the backend services (Go, PostgreSQL, Redis).
 
-**Edit a file directly in GitHub**
+## Key API Endpoints
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+The frontend interacts with several key backend endpoints to provide its functionality:
 
-**Use GitHub Codespaces**
+---
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/5984185c-c31d-40e1-92a7-cafa6296d87d) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Thank you for checking out ScriptEcho! I'am excited to see what you create.
