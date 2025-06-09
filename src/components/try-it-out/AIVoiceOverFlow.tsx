@@ -1,299 +1,281 @@
-// src/components/try-it-out/AIVoiceOverFlow.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
-import { Textarea } from '../ui/textarea';
-import { ScrollArea } from '../ui/scroll-area';
-import {
-    Loader2,
-    Mic2,
-    Info,
-    AudioWaveform,
-    Play,
-    Pause,
-} from 'lucide-react';
-
-type AIVoiceOverStateType = 'idle' | 'loadingAnalysis' | 'ready' | 'loadingAudio' | 'playerReady' | 'error';
+import { Play, Pause, Volume2, Edit, RotateCcw, ArrowLeft } from 'lucide-react';
 
 interface AIVoiceOverFlowProps {
-    aiVoiceOverState: AIVoiceOverStateType;
-    setAiVoiceOverState: React.Dispatch<React.SetStateAction<AIVoiceOverStateType>>;
-    initialScriptForVO: string;
-    voiceOverAudioBlob: Blob | null;
-    audioPlayerRef: React.RefObject<HTMLAudioElement>;
-    isAudioActuallyPlaying: boolean;
-    onToggleAudioPlayback: () => void;
-    onPrepareAudioPlayback: (text: string) => void;
-    onSetViewModeToScript: () => void;
-    onRetryAIVoiceOver: () => void;
-    onSetIsAudioActuallyPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+  aiVoiceOverState: 'idle' | 'loadingAnalysis' | 'ready' | 'loadingAudio' | 'playerReady' | 'error';
+  setAiVoiceOverState: (state: 'idle' | 'loadingAnalysis' | 'ready' | 'loadingAudio' | 'playerReady' | 'error') => void;
+  initialScriptForVO: string;
+  voiceOverAudioBlob: Blob | null;
+  audioPlayerRef: React.RefObject<HTMLAudioElement>;
+  isAudioActuallyPlaying: boolean;
+  onSetIsAudioActuallyPlaying: (playing: boolean) => void;
+  onToggleAudioPlayback: () => void;
+  onPrepareAudioPlayback: (text: string) => Promise<void>;
+  onSetViewModeToScript: () => void;
+  onRetryAIVoiceOver: () => void;
 }
 
-// SoundWaveVisualizer Component (assuming this is correct as provided)
-interface SoundWaveVisualizerProps {
-    isPlaying: boolean;
-    barColor?: string;
-    barCount?: number;
-    containerHeight?: string; // Renamed from maxHeight for clarity, this is for the container
-    barWidth?: string;
-    gap?: string; // Tailwind class for gap between bars
-}
-
-const SoundWaveVisualizer: React.FC<SoundWaveVisualizerProps> = ({
-    isPlaying,
-    barColor = "bg-[#121212]", // Black bars
-    barCount = 50, // Adjusted for the image's density
-    containerHeight = "h-16", // e.g., h-16, h-20, h-24
-    barWidth = "w-0.5", // Thinner bars, e.g., w-px, w-0.5 (2px), w-1 (4px)
-    gap = "gap-px", // Using Tailwind's gap utility for spacing
-}) => {
-    return (
-        <div className={`flex items-center justify-center w-full ${containerHeight}`}>
-            <div className={`flex items-end justify-center h-full ${gap}`}>
-                {[...Array(barCount)].map((_, i) => (
-                    <div
-                        key={i}
-                        className={`soundwave-bar ${barWidth} ${barColor} rounded-t-sm ${isPlaying ? 'playing' : ''}`}
-                        style={
-                            isPlaying
-                                ? {
-                                    animationDelay: `${i * 0.03}s`, // Staggered delay for a wave effect
-                                    animationDuration: `${0.8 + Math.random() * 0.7}s`, // Randomize duration slightly
-                                    // Set initial transform scale to a low value when not playing
-                                    transform: 'scaleY(0.1)',
-                                }
-                                : {
-                                    transform: 'scaleY(0.1)', // Keep bars minimal when paused
-                                }
-                        }
-                    />
-                ))}
-            </div>
-        </div>
-    );
+const SoundWaveBars: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
+  return (
+    <div className="flex items-center justify-center space-x-1 h-8">
+      {[...Array(12)].map((_, i) => (
+        <div
+          key={i}
+          className={`bg-blue-500 rounded-full transition-all duration-200 ${
+            isPlaying ? 'soundwave-bar playing' : 'soundwave-bar'
+          }`}
+          style={{
+            width: '3px',
+            height: isPlaying ? '8px' : '4px',
+            animationDelay: `${i * 0.1}s`,
+            animationDuration: `${0.5 + Math.random() * 0.5}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
 };
 
 const AIVoiceOverFlow: React.FC<AIVoiceOverFlowProps> = ({
-    aiVoiceOverState,
-    setAiVoiceOverState,
-    initialScriptForVO,
-    voiceOverAudioBlob,
-    audioPlayerRef,
-    isAudioActuallyPlaying,
-    onToggleAudioPlayback,
-    onPrepareAudioPlayback,
-    onSetViewModeToScript,
-    onRetryAIVoiceOver,
-    onSetIsAudioActuallyPlaying,
+  aiVoiceOverState,
+  setAiVoiceOverState,
+  initialScriptForVO,
+  voiceOverAudioBlob,
+  audioPlayerRef,
+  isAudioActuallyPlaying,
+  onSetIsAudioActuallyPlaying,
+  onToggleAudioPlayback,
+  onPrepareAudioPlayback,
+  onSetViewModeToScript,
+  onRetryAIVoiceOver,
 }) => {
-    const [isVoiceOverEditing, setIsVoiceOverEditing] = useState(false);
-    const [analyzedScriptForVO, setAnalyzedScriptForVO] = useState(initialScriptForVO);
-    const [audioSrc, setAudioSrc] = useState<string>('');
+  const [editedScript, setEditedScript] = useState(initialScriptForVO);
+  const [isEditing, setIsEditing] = useState(false);
+  const activeBlobUrlRef = useRef<string | null>(null);
 
-    useEffect(() => {
-        setAnalyzedScriptForVO(initialScriptForVO);
-    }, [initialScriptForVO]);
+  useEffect(() => {
+    setEditedScript(initialScriptForVO);
+  }, [initialScriptForVO]);
 
-    // This hook manages the blob URL lifecycle.
-    // It creates a URL when a new blob is received and revokes it on cleanup.
-    useEffect(() => {
-        if (voiceOverAudioBlob) {
-            const newUrl = URL.createObjectURL(voiceOverAudioBlob);
-            console.log("AIVO_FLOW: useEffect[voiceOverAudioBlob] - Created new blob URL:", newUrl);
-            setAudioSrc(newUrl);
+  useEffect(() => {
+    if (voiceOverAudioBlob) {
+      // Revoke the old blob URL if it exists
+      if (activeBlobUrlRef.current) {
+        URL.revokeObjectURL(activeBlobUrlRef.current);
+      }
 
-            // The cleanup function is critical. It runs when the component
-            // unmounts, or before the effect runs again for a new blob.
-            return () => {
-                console.log("AIVO_FLOW: useEffect[voiceOverAudioBlob] cleanup - Revoking URL:", newUrl);
-                URL.revokeObjectURL(newUrl);
-            };
-        }
-        // If the blob is null, no URL is needed. The old one is revoked by the cleanup function.
-        setAudioSrc('');
-    }, [voiceOverAudioBlob]);
+      // Create a new object URL for the new blob
+      const url = URL.createObjectURL(voiceOverAudioBlob);
+      activeBlobUrlRef.current = url;
 
-    return (
-        <Card className="bg-[#F5F5F5] text-[#121212] rounded-xl shadow-2xl p-6 sm:p-8 max-w-4xl w-full animate-fade-in z-20
-                       min-h-[70vh] flex flex-col" >
+      // Set the audio source to the new object URL
+      if (audioPlayerRef.current) {
+        audioPlayerRef.current.src = url;
+        audioPlayerRef.current.load(); // Load the new source
+        setAiVoiceOverState('playerReady');
+      }
+    }
+  }, [voiceOverAudioBlob, audioPlayerRef, setAiVoiceOverState]);
 
-            {/* State 1: Loading Analysis */}
-            {aiVoiceOverState === 'loadingAnalysis' && (
-                <div className="flex flex-col items-center justify-center flex-grow space-y-4">
-                    <Loader2 size={48} className="text-[#121212] animate-spin" />
-                    <p className="text-xl font-semibold text-[#121212]">Preparing text for AI voiceover...</p>
-                    <p className="text-sm text-gray-600">Please wait, this may take a few moments.</p>
+  useEffect(() => {
+    const audioElement = audioPlayerRef.current;
+    if (!audioElement) return;
+
+    const handlePlay = () => onSetIsAudioActuallyPlaying(true);
+    const handlePause = () => onSetIsAudioActuallyPlaying(false);
+    const handleEnded = () => onSetIsAudioActuallyPlaying(false);
+
+    audioElement.addEventListener('play', handlePlay);
+    audioElement.addEventListener('pause', handlePause);
+    audioElement.addEventListener('ended', handleEnded);
+
+    return () => {
+      audioElement.removeEventListener('play', handlePlay);
+      audioElement.removeEventListener('pause', handlePause);
+      audioElement.removeEventListener('ended', handleEnded);
+    };
+  }, [audioPlayerRef, onSetIsAudioActuallyPlaying]);
+
+  useEffect(() => {
+    return () => {
+      console.log("AUDIO_CLEANUP: AIVoiceOverFlow unmounting.");
+      // Revoke the blob URL to free up resources
+      if (activeBlobUrlRef.current) {
+        URL.revokeObjectURL(activeBlobUrlRef.current);
+        activeBlobUrlRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleGenerateAudio = async () => {
+    if (!editedScript.trim()) {
+      alert("Please enter some text to generate audio.");
+      return;
+    }
+    await onPrepareAudioPlayback(editedScript);
+  };
+
+  const renderContent = () => {
+    switch (aiVoiceOverState) {
+      case 'loadingAnalysis':
+        return (
+          <div className="text-center py-12">
+            <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <h3 className="text-xl font-semibold mb-2">Analyzing Script</h3>
+            <p className="text-gray-600">Preparing your script for voice synthesis...</p>
+          </div>
+        );
+
+      case 'ready':
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold">AI Voice Over</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditing(!isEditing)}
+                className="text-blue-600 hover:text-blue-800"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                {isEditing ? 'Done' : 'Edit'}
+              </Button>
+            </div>
+
+            <div className="bg-white border-2 border-gray-200 rounded-lg p-4 min-h-[200px]">
+              {isEditing ? (
+                <textarea
+                  value={editedScript}
+                  onChange={(e) => setEditedScript(e.target.value)}
+                  className="w-full h-full min-h-[180px] resize-none border-none outline-none text-gray-800 leading-relaxed"
+                  placeholder="Edit your script here..."
+                />
+              ) : (
+                <div className="whitespace-pre-wrap text-gray-800 leading-relaxed">
+                  {editedScript || "No script content available."}
                 </div>
+              )}
+            </div>
+
+            <Button
+              onClick={handleGenerateAudio}
+              disabled={!editedScript.trim()}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold"
+            >
+              <Volume2 className="w-5 h-5 mr-2" />
+              Generate Voice Over
+            </Button>
+          </div>
+        );
+
+      case 'loadingAudio':
+        return (
+          <div className="text-center py-12">
+            <SoundWaveBars isPlaying={true} />
+            <h3 className="text-xl font-semibold mb-2 mt-4">Generating Audio</h3>
+            <p className="text-gray-600">Creating your voice over...</p>
+          </div>
+        );
+
+      case 'playerReady':
+        return (
+          <div className="space-y-6">
+            <h3 className="text-2xl font-bold text-center">Your Voice Over is Ready!</h3>
+            
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 text-center">
+              <SoundWaveBars isPlaying={isAudioActuallyPlaying} />
+              
+              <div className="flex justify-center mt-6 space-x-4">
+                <Button
+                  onClick={onToggleAudioPlayback}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
+                >
+                  {isAudioActuallyPlaying ? (
+                    <>
+                      <Pause className="w-5 h-5 mr-2" />
+                      Pause
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-5 h-5 mr-2" />
+                      Play
+                    </>
+                  )}
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsEditing(true);
+                    setAiVoiceOverState('ready');
+                  }}
+                  className="px-6 py-3"
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Script
+                </Button>
+              </div>
+            </div>
+
+            {voiceOverAudioBlob && (
+              <audio
+                ref={audioPlayerRef}
+                className="hidden"
+                onPlay={() => onSetIsAudioActuallyPlaying(true)}
+                onPause={() => onSetIsAudioActuallyPlaying(false)}
+                onEnded={() => onSetIsAudioActuallyPlaying(false)}
+              />
             )}
+          </div>
+        );
 
-            {/* State 2: AI Voice-Over Ready */}
-            {aiVoiceOverState === 'ready' && (
-                <div className="flex flex-col flex-grow">
-                    {/* Header Section */}
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                        <h2 className="text-2xl sm:text-3xl font-semibold">
-                            <span className="flex items-center gap-2">
-                                <Mic2 size={28} className="text-[#121212]" />
-                                AI Voice-Over
-                            </span>
-                        </h2>
-                        <div className="flex gap-2 flex-wrap">
-                            <Button
-                                variant="outline"
-                                onClick={() => setIsVoiceOverEditing(!isVoiceOverEditing)}
-                                className="border-2 border-[#121212] text-[#121212] hover:bg-[#121212] hover:text-[#F5F5F5] text-sm px-3 py-1.5 sm:px-4 sm:py-2"
-                            >
-                                {isVoiceOverEditing ? 'View Text' : 'Edit Text'}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                onClick={onSetViewModeToScript}
-                                className="border-2 border-[#121212] text-[#121212] hover:bg-[#121212] hover:text-[#F5F5F5] text-sm px-3 py-1.5 sm:px-4 sm:py-2"
-                            >
-                                Back to Script
-                            </Button>
-                        </div>
-                    </div>
+      case 'error':
+        return (
+          <div className="text-center py-12">
+            <div className="text-red-500 mb-4">
+              <svg className="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Something went wrong</h3>
+            <p className="text-gray-600 mb-4">We couldn't generate your voice over. Please try again.</p>
+            <Button
+              onClick={onRetryAIVoiceOver}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Try Again
+            </Button>
+          </div>
+        );
 
-                    {/* Script View/Edit Box */}
-                    <div className="bg-neutral-100 border border-neutral-300 rounded-lg shadow-inner overflow-hidden p-4 mb-6 flex flex-col flex-grow min-h-[250px]">
-                        {isVoiceOverEditing ? (
-                            <Textarea
-                                value={analyzedScriptForVO}
-                                onChange={(e) => setAnalyzedScriptForVO(e.target.value)}
-                                className="w-full bg-transparent text-[#33302E] font-sans text-base leading-relaxed resize-none focus:outline-none focus:ring-0 border-none flex-grow p-0"
-                                placeholder="Script text for voice-over. You can edit it here before generating the audio."
-                            />
-                        ) : (
-                            <ScrollArea className="flex-grow">
-                                <p className="font-sans text-[#33302E] whitespace-pre-wrap text-base leading-relaxed">
-                                    {analyzedScriptForVO || 'No script text available. Please try generating the script again or check the API.'}
-                                </p>
-                            </ScrollArea>
-                        )}
-                    </div>
+      default:
+        return (
+          <div className="text-center py-12">
+            <p className="text-gray-600">Initializing AI Voice Over...</p>
+          </div>
+        );
+    }
+  };
 
-                    {/* "Generate Audio" Button */}
-                    <div className="flex flex-col items-center justify-center mt-auto pt-4">
-                        <Button
-                            onClick={() => onPrepareAudioPlayback(analyzedScriptForVO)}
-                            className="group bg-transparent hover:bg-[#121212] p-3 rounded-full border-2 border-[#121212] shadow-md hover:shadow-lg transition-colors duration-200 ease-in-out"
-                            aria-label="Generate Audio"
-                            title="Generate Audio"
-                            disabled={!analyzedScriptForVO.trim()}
-                        >
-                            <AudioWaveform size={32} className="text-[#121212] group-hover:text-[#F5F5F5] transition-colors duration-200 ease-in-out" />
-                        </Button>
-                        <p className="text-center text-sm text-gray-600 mt-3">
-                            Click to generate audio
-                        </p>
-                    </div>
-                </div>
-            )}
+  return (
+    <Card className="bg-[#F5F5F5] text-[#121212] rounded-xl shadow-2xl p-8 max-w-4xl w-full z-20 min-h-[500px]">
+      <div className="flex items-center mb-6">
+        <Button
+          variant="ghost"
+          onClick={onSetViewModeToScript}
+          className="text-gray-600 hover:text-gray-800 p-2"
+        >
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          Back to Script
+        </Button>
+      </div>
 
-            {/* State 3: Sound Wave Player (Loading Audio / Player Ready) */}
-            {(aiVoiceOverState === 'loadingAudio' || aiVoiceOverState === 'playerReady') && audioSrc && (
-                <div className="flex flex-col items-center justify-center flex-grow space-y-6">
-                    <h2 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
-                        <span className="flex items-center justify-center gap-2">
-                            <AudioWaveform size={28} className="text-[#121212]" />
-                            Voice Playback
-                        </span>
-                    </h2>
-                    {/* Visualizer Container - Ensure it has a defined height for the bars to scale within */}
-                    <div className="w-full max-w-md h-24 bg-transparent rounded-lg flex items-center justify-center"> {/* Removed border and bg for a cleaner look if desired, or keep bg-[#F5F5F5] */}
-                        {aiVoiceOverState === 'loadingAudio' ? (
-                            <div className="flex flex-col items-center text-sm text-neutral-600">
-                                <Loader2 size={24} className="text-[#121212] animate-spin mb-1" />
-                                Loading audio...
-                            </div>
-                        ) : (
-                            <SoundWaveVisualizer
-                                isPlaying={isAudioActuallyPlaying}
-                                barCount={50} // Example adjustment
-                                containerHeight="h-20" // Match this height for bars to scale correctly
-                                barWidth="w-0.5" // Thinner bars
-                                gap="gap-px" // Minimal gap
-                                barColor="bg-black" // Black bars as per image
-                            />
-                        )}
-                    </div>
-                    <Button
-                        onClick={onToggleAudioPlayback}
-                        disabled={aiVoiceOverState === 'loadingAudio'}
-                        className={`px-6 py-3 rounded-md font-medium transition-all flex items-center justify-center w-36
-                                      bg-[#121212] text-[#F5F5F5] hover:bg-[#333333]
-                                      disabled:bg-neutral-400 disabled:text-neutral-700 disabled:cursor-not-allowed`}
-                    >
-                        {aiVoiceOverState === 'loadingAudio' ? (
-                            <Loader2 size={20} className="animate-spin" />
-                        ) : isAudioActuallyPlaying ? (
-                            <Pause size={20} className="mr-2" />
-                        ) : (
-                            <Play size={20} className="mr-2" />
-                        )}
-                        {aiVoiceOverState === 'loadingAudio' ? 'Loading' : (isAudioActuallyPlaying ? 'Pause' : 'Play')}
-                    </Button>
-                    <audio
-                        ref={audioPlayerRef}
-                        src={audioSrc}
-                        onPlay={() => onSetIsAudioActuallyPlaying(true)}
-                        onPause={() => onSetIsAudioActuallyPlaying(false)}
-                        onEnded={() => onSetIsAudioActuallyPlaying(false)}
-                        onLoadedData={() => {
-                            if (aiVoiceOverState === 'loadingAudio') {
-                                setAiVoiceOverState('playerReady');
-                            }
-                        }}
-                        onError={(e) => {
-                            console.error("Audio player error:", e);
-                            setAiVoiceOverState('error');
-                            alert("Error loading audio. The file might be unsupported or the URL is invalid.");
-                        }}
-                        className="hidden"
-                    />
-                    <Button
-                        variant="outline"
-                        onClick={() => {
-                            setAiVoiceOverState('ready');
-                            if (audioPlayerRef.current) {
-                                audioPlayerRef.current.pause();
-                                // audioPlayerRef.current.currentTime = 0; // Keep current time to resume if user comes back quickly
-                            }
-                            onSetIsAudioActuallyPlaying(false);
-                        }}
-                        className="border-2 border-[#121212] text-[#121212] hover:bg-[#121212] hover:text-[#F5F5F5] text-sm px-4 py-2 mt-4"
-                    >
-                        Back to Text Options
-                    </Button>
-                </div>
-            )}
-
-            {/* State 4: Error State */}
-            {aiVoiceOverState === 'error' && (
-                <div className="flex flex-col items-center justify-center flex-grow space-y-4 text-red-600">
-                    <Info size={48} />
-                    <p className="text-xl font-medium">Voice-Over Process Failed</p>
-                    <p className="text-sm text-center">An error occurred. Please try again or go back to the script.</p>
-                    <div className="flex gap-3 mt-4">
-                        <Button
-                            variant="outline"
-                            onClick={onSetViewModeToScript}
-                            className="border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-sm px-4 py-2"
-                        >
-                            Back to Script
-                        </Button>
-                        <Button
-                            onClick={onRetryAIVoiceOver}
-                            className="bg-red-500 text-white hover:bg-red-600 text-sm px-4 py-2"
-                        >
-                            Try Preparing Text Again
-                        </Button>
-                    </div>
-                </div>
-            )}
-        </Card>
-    );
+      {renderContent()}
+    </Card>
+  );
 };
 
 export default AIVoiceOverFlow;

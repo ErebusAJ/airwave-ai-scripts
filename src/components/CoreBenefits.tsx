@@ -21,24 +21,29 @@ const BenefitCard: React.FC<BenefitCardProps> = ({ icon, title, description, del
   return (
     <Card 
       ref={cardRef}
-      className="bg-gradient-to-br from-white to-[#F0F0F0] text-[#121212] rounded-lg p-8 text-center fade-in-up card-hover shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 group overflow-hidden relative"
+      className="bg-gradient-to-br from-white to-[#F8F8F8] text-[#121212] rounded-2xl p-6 text-left fade-in-up shadow-xl border-2 border-gray-100 hover:shadow-2xl transition-all duration-500 group overflow-hidden relative transform hover:-rotate-1 hover:scale-105"
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#F5F5F5]/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
+      {/* Animated background gradient on hover */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 opacity-0 group-hover:opacity-50 transition-opacity duration-500"></div>
       
-      <div className="text-gray-600 mb-6 flex justify-center transform group-hover:scale-110 transition-transform duration-300">
-        <div className="p-3 rounded-full bg-[#F5F5F5] shadow-md">
-          {icon}
+      <div className="relative z-10">
+        <div className="text-gray-700 mb-4 flex justify-start transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
+          <div className="p-3 rounded-full bg-gradient-to-br from-[#F5F5F5] to-gray-100 shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+            {icon}
+          </div>
         </div>
+        
+        <h3 className="text-xl font-bold mb-3 relative group-hover:text-indigo-700 transition-colors duration-300">
+          {title}
+        </h3>
+        
+        <p className="text-gray-600 text-sm leading-relaxed group-hover:text-gray-800 transition-colors duration-300">
+          {description}
+        </p>
       </div>
       
-      <h3 className="text-2xl font-medium mb-4 relative">
-        {title}
-        <div className="h-1 w-0 group-hover:w-1/3 bg-[#121212] absolute bottom-0 left-1/2 transform -translate-x-1/2 transition-all duration-300 ease-out"></div>
-      </h3>
-      
-      <p className="text-gray-600 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        {description}
-      </p>
+      {/* Corner decoration */}
+      <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-yellow-200 to-transparent opacity-0 group-hover:opacity-30 transition-opacity duration-500 rounded-bl-full"></div>
     </Card>
   );
 };
@@ -140,12 +145,12 @@ const CoreBenefits: React.FC = () => {
         
         <div 
           ref={cardsRef}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
           data-scroll="fade-up"
         >
           <BenefitCard 
             icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             } 
@@ -155,7 +160,7 @@ const CoreBenefits: React.FC = () => {
           />
           <BenefitCard 
             icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             } 
@@ -165,7 +170,7 @@ const CoreBenefits: React.FC = () => {
           />
           <BenefitCard 
             icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
               </svg>
             } 
@@ -175,7 +180,7 @@ const CoreBenefits: React.FC = () => {
           />
           <BenefitCard 
             icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
               </svg>
             } 

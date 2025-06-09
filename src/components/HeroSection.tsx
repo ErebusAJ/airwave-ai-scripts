@@ -1,8 +1,10 @@
+
 import React, { useEffect, useRef } from 'react';
 import ParticleBackground from './ParticleBackground';
 
 const HeroSection: React.FC = () => {
   const headlineRef = useRef<HTMLHeadingElement>(null);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -10,6 +12,12 @@ const HeroSection: React.FC = () => {
     const timer = setTimeout(() => {
       if (headlineRef.current) {
         headlineRef.current.classList.add('active');
+      }
+      // Add description animation with delay
+      if (descriptionRef.current) {
+        setTimeout(() => {
+          descriptionRef.current?.classList.add('in-view');
+        }, 800);
       }
     }, 500);
 
@@ -37,9 +45,17 @@ const HeroSection: React.FC = () => {
         >
           From Idea to Airwaves in One Click.
         </h1>
-        <p className="text-gray-400 text-lg md:text-xl mb-10">
-          {/* Generate pro video scripts and instant AI voice-overs. */}
+        
+        <p 
+          ref={descriptionRef}
+          className="text-[#F5F5F5] text-lg md:text-xl mb-10 max-w-3xl mx-auto leading-relaxed fade-in-up opacity-0"
+        >
+          Transform your creative ideas into professional scripts tailored for YouTube, TikTok, Instagram, and more. 
+          Our AI understands platform-specific formats and audience preferences, then brings your content to life 
+          with studio-quality voice synthesis. Create engaging content that resonates with your audience in minutes, 
+          not hours.
         </p>
+        
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <button 
             onClick={() => scrollToSection('try-it-out')}
