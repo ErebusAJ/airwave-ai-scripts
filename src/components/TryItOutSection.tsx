@@ -38,7 +38,7 @@ const TryItOutSection: React.FC = () => {
   const [viewMode, setViewMode] = useState<'script' | 'aiVoiceOver'>('script');
   const [aiVoiceOverState, setAiVoiceOverState] = useState<'idle' | 'loadingAnalysis' | 'ready' | 'loadingAudio' | 'playerReady' | 'error'>('idle');
   const [speakableTextForVO, setSpeakableTextForVO] = useState<string>(""); // State for speakable text
-  const [voiceOverAudioSrc, setVoiceOverAudioSrc] = useState<string | null>(null);
+  const [voiceOverAudioBlob, setVoiceOverAudioBlob] = useState<Blob | null>(null);
   const audioPlayerRef = useRef<HTMLAudioElement>(null);
   const [isAudioActuallyPlaying, setIsAudioActuallyPlaying] = useState(false);
 
@@ -206,25 +206,15 @@ const TryItOutSection: React.FC = () => {
     }
     console.log("AUDIO_GEN: Initiating. Text snippet:", textToSpeak.substring(0, 70) + "...");
     setAiVoiceOverState('loadingAudio');
+    setIsAudioActuallyPlaying(false);
+    setVoiceOverAudioBlob(null); // Clear any previous blob
 
-    if (voiceOverAudioSrc && voiceOverAudioSrc.startsWith('blob:')) {
-      URL.revokeObjectURL(voiceOverAudioSrc);
-      console.log("AUDIO_GEN: Revoked previous audio object URL:", voiceOverAudioSrc);
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause();
     }
-    setVoiceOverAudioSrc(null); // Clear src to ensure <audio> re-evaluates
-
-    if (activeBlobUrlRef.current) {
-      URL.revokeObjectURL(activeBlobUrlRef.current);
-      console.log("AUDIO_GEN: Revoked previous activeBlobUrlRef:", activeBlobUrlRef.current);
-      activeBlobUrlRef.current = null;
-    }
-    setVoiceOverAudioSrc(null);
 
     const requestPayload = {
       text: textToSpeak,
-      // !!! CRITICAL: Ensure this payload matches your working Postman request's JSON body !!!
-      // If Postman sends 'voice_id', 'model_id', etc., include them here.
-      // voice_id: "your_voice_id_from_postman_if_any",
     };
     console.log("AUDIO_GEN: Request payload to Go backend:", JSON.stringify(requestPayload, null, 2));
 
@@ -233,50 +223,52 @@ const TryItOutSection: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'audio/mpeg, application/json', // Prefer audio, allow JSON for errors
+          'Accept': 'audio/mpeg, application/json',
         },
         body: JSON.stringify(requestPayload),
       });
 
-      console.log("AUDIO_GEN: Request payload to Go backend:", JSON.stringify(requestPayload, null, 2));
-
       if (!audioApiResponse.ok) {
-        // ... (Your existing robust error handling for non-OK responses using clone() - this is good)
         let errorDetails = `Audio generation failed: ${audioApiResponse.status}`;
         const errorResponseForJson = audioApiResponse.clone();
         const errorResponseForText = audioApiResponse.clone();
-        try { /* ... */ } catch (jsonError) { /* ... */ }
+        try {
+          const errorData = await errorResponseForJson.json();
+          errorDetails += ` - ${errorData.message || JSON.stringify(errorData)}`;
+        } catch (jsonError) {
+          console.warn("Failed to parse audio gen error as JSON:", jsonError);
+          try {
+            const errorText = await errorResponseForText.text();
+            errorDetails += ` - ${errorText}`;
+          } catch (textError) {
+            console.warn("Failed to read audio gen error body as text:", textError);
+            errorDetails += ` - Could not read error body.`;
+          }
+        }
         throw new Error(errorDetails);
       }
 
-      const serverContentType = audioApiResponse.headers.get("content-type")?.toLowerCase();
-
-      if (!serverContentType || (!serverContentType.includes("audio/mpeg") && !serverContentType.includes("audio/mp3") && !serverContentType.includes("audio/mpga"))) {
-        const unexpectedBody = await audioApiResponse.text();
-        throw new Error(`Server 200 OK, but Content-Type '${serverContentType}' is not expected audio.`);
-      }
+      const serverContentType = audioApiResponse.headers.get("content-type")?.toLowerCase() || '';
+      console.log("AUDIO_GEN: Server responded with Content-Type:", serverContentType);
 
       const rawAudioBlob = await audioApiResponse.blob();
-      // ... (console logs for rawAudioBlob, debug download link as before) ...
-      if (rawAudioBlob.size === 0) { /* throw error */ }
+      console.log("AUDIO_GEN: Received raw audio blob. Size:", rawAudioBlob.size, "Type:", rawAudioBlob.type);
 
-      const playerSpecificMimeType = 'audio/mpeg';
-      const playerReadyBlob = new Blob([rawAudioBlob], { type: playerSpecificMimeType });
+      if (rawAudioBlob.size === 0) {
+        throw new Error("Audio generation resulted in an empty file.");
+      }
 
-      const newObjectUrl = URL.createObjectURL(playerReadyBlob); // Create the new URL
+      const mimeType = 'audio/mpeg'; // Standardize to audio/mpeg for broad compatibility
+      const playerReadyBlob = new Blob([rawAudioBlob], { type: mimeType });
 
-      activeBlobUrlRef.current = newObjectUrl; // Store it as the currently active one for future cleanup
-
-      console.log("AUDIO_GEN: Created NEW audio object URL:", newObjectUrl);
-      setVoiceOverAudioSrc(newObjectUrl); // NOW set the state to trigger re-render and <audio> src update
+      console.log("AUDIO_GEN: Created playerReadyBlob, passing to AIVoiceOverFlow. Size:", playerReadyBlob.size, "Type:", playerReadyBlob.type);
+      setVoiceOverAudioBlob(playerReadyBlob); // Set the Blob object directly in state.
 
     } catch (error) {
       console.error("AUDIO_GEN: CATCH BLOCK - Error:", error);
       alert(`Error generating audio: ${error instanceof Error ? error.message : String(error)}`);
       setAiVoiceOverState('error');
-      // If an error occurs, ensure any potentially created (but unused) blob URL is also cleaned up
-      // though in this flow, newObjectUrl wouldn't be set yet if fetch failed.
-      // If activeBlobUrlRef.current was set by a *previous* successful call, it should remain until next success or unmount.
+      setVoiceOverAudioBlob(null);
     }
   };
 
@@ -302,22 +294,17 @@ const TryItOutSection: React.FC = () => {
       }
       setIsAudioActuallyPlaying(false);
     };
-  }, [voiceOverAudioSrc]);
+  }, [voiceOverAudioBlob]);
 
   useEffect(() => {
     // This function now ONLY runs when TryItOutSection unmounts
     return () => {
-      console.log("AUDIO_CLEANUP: TryItOutSection unmounting. Cleaning up active blob URL.");
-      if (activeBlobUrlRef.current) {
-        URL.revokeObjectURL(activeBlobUrlRef.current);
-        console.log("AUDIO_CLEANUP: Revoked activeBlobUrlRef on unmount:", activeBlobUrlRef.current);
-        activeBlobUrlRef.current = null;
-      }
-      // Also, ensure audio player is properly reset if it exists
+      console.log("AUDIO_CLEANUP: TryItOutSection unmounting.");
+      // All blob URL cleanup is now handled in AIVoiceOverFlow
       if (audioPlayerRef.current) {
         audioPlayerRef.current.pause();
-        audioPlayerRef.current.removeAttribute('src'); // Remove src to stop any loading/playing
-        audioPlayerRef.current.load(); // Resets the media element to its initial state
+        audioPlayerRef.current.removeAttribute('src');
+        audioPlayerRef.current.load();
       }
     };
   }, []);
@@ -335,21 +322,13 @@ const TryItOutSection: React.FC = () => {
     setViewMode('script');
     setAiVoiceOverState('idle');
     setSpeakableTextForVO("");
-    setVoiceOverAudioSrc(null);
+    setVoiceOverAudioBlob(null); // Clear the blob
     if (audioPlayerRef.current) {
       audioPlayerRef.current.pause();
       audioPlayerRef.current.removeAttribute('src');
-      audioPlayerRef.current.load(); // Reset
+      audioPlayerRef.current.load();
       audioPlayerRef.current.currentTime = 0;
     }
-    setIsAudioActuallyPlaying(false);
-    if (activeBlobUrlRef.current) {
-      URL.revokeObjectURL(activeBlobUrlRef.current);
-      console.log("AUDIO_CLEANUP: Revoked activeBlobUrlRef in handleBackToForm:", activeBlobUrlRef.current);
-      activeBlobUrlRef.current = null;
-    }
-    setVoiceOverAudioSrc(null);
-
     setIsAudioActuallyPlaying(false);
   };
 
@@ -399,19 +378,15 @@ const TryItOutSection: React.FC = () => {
         <AIVoiceOverFlow
           aiVoiceOverState={aiVoiceOverState}
           setAiVoiceOverState={setAiVoiceOverState}
-          initialScriptForVO={speakableTextForVO} // Updated
-          voiceOverAudioSrc={voiceOverAudioSrc}
+          initialScriptForVO={speakableTextForVO}
+          voiceOverAudioBlob={voiceOverAudioBlob}
           audioPlayerRef={audioPlayerRef}
           isAudioActuallyPlaying={isAudioActuallyPlaying}
           onSetIsAudioActuallyPlaying={setIsAudioActuallyPlaying}
           onToggleAudioPlayback={toggleAudioPlayback}
-          onPrepareAudioPlayback={handleGenerateAudioFromSpeakableText} // Updated, now takes edited text
+          onPrepareAudioPlayback={handleGenerateAudioFromSpeakableText}
           onSetViewModeToScript={() => {
             setViewMode('script');
-            // Optionally reset AI voice-over specific states if desired
-            // setAiVoiceOverState('idle');
-            // setSpeakableTextForVO("");
-            // setVoiceOverAudioSrc(null);
           }}
           onRetryAIVoiceOver={handlePrepareSpeakableTextAndStartVO} // Retry fetching speakable text
         />

@@ -18,14 +18,14 @@ type AIVoiceOverStateType = 'idle' | 'loadingAnalysis' | 'ready' | 'loadingAudio
 interface AIVoiceOverFlowProps {
     aiVoiceOverState: AIVoiceOverStateType;
     setAiVoiceOverState: React.Dispatch<React.SetStateAction<AIVoiceOverStateType>>;
-    initialScriptForVO: string; // This will be the speakable text from the API
-    voiceOverAudioSrc: string | null;
+    initialScriptForVO: string;
+    voiceOverAudioBlob: Blob | null;
     audioPlayerRef: React.RefObject<HTMLAudioElement>;
     isAudioActuallyPlaying: boolean;
     onToggleAudioPlayback: () => void;
-    onPrepareAudioPlayback: (textToSpeak: string) => void; // MODIFIED: Expects the text to be spoken
+    onPrepareAudioPlayback: (text: string) => void;
     onSetViewModeToScript: () => void;
-    onRetryAIVoiceOver: () => void; // This should retry fetching the speakable text
+    onRetryAIVoiceOver: () => void;
     onSetIsAudioActuallyPlaying: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -77,7 +77,7 @@ const AIVoiceOverFlow: React.FC<AIVoiceOverFlowProps> = ({
     aiVoiceOverState,
     setAiVoiceOverState,
     initialScriptForVO,
-    voiceOverAudioSrc,
+    voiceOverAudioBlob,
     audioPlayerRef,
     isAudioActuallyPlaying,
     onToggleAudioPlayback,
@@ -88,13 +88,30 @@ const AIVoiceOverFlow: React.FC<AIVoiceOverFlowProps> = ({
 }) => {
     const [isVoiceOverEditing, setIsVoiceOverEditing] = useState(false);
     const [analyzedScriptForVO, setAnalyzedScriptForVO] = useState(initialScriptForVO);
+    const [audioSrc, setAudioSrc] = useState<string>('');
 
     useEffect(() => {
         setAnalyzedScriptForVO(initialScriptForVO);
     }, [initialScriptForVO]);
 
-    // The rest of the AIVoiceOverFlow component remains the same as your provided code.
-    // The key change is how SoundWaveVisualizer is implemented and styled.
+    // This hook manages the blob URL lifecycle.
+    // It creates a URL when a new blob is received and revokes it on cleanup.
+    useEffect(() => {
+        if (voiceOverAudioBlob) {
+            const newUrl = URL.createObjectURL(voiceOverAudioBlob);
+            console.log("AIVO_FLOW: useEffect[voiceOverAudioBlob] - Created new blob URL:", newUrl);
+            setAudioSrc(newUrl);
+
+            // The cleanup function is critical. It runs when the component
+            // unmounts, or before the effect runs again for a new blob.
+            return () => {
+                console.log("AIVO_FLOW: useEffect[voiceOverAudioBlob] cleanup - Revoking URL:", newUrl);
+                URL.revokeObjectURL(newUrl);
+            };
+        }
+        // If the blob is null, no URL is needed. The old one is revoked by the cleanup function.
+        setAudioSrc('');
+    }, [voiceOverAudioBlob]);
 
     return (
         <Card className="bg-[#F5F5F5] text-[#121212] rounded-xl shadow-2xl p-6 sm:p-8 max-w-4xl w-full animate-fade-in z-20
@@ -175,7 +192,7 @@ const AIVoiceOverFlow: React.FC<AIVoiceOverFlowProps> = ({
             )}
 
             {/* State 3: Sound Wave Player (Loading Audio / Player Ready) */}
-            {(aiVoiceOverState === 'loadingAudio' || aiVoiceOverState === 'playerReady') && voiceOverAudioSrc && (
+            {(aiVoiceOverState === 'loadingAudio' || aiVoiceOverState === 'playerReady') && audioSrc && (
                 <div className="flex flex-col items-center justify-center flex-grow space-y-6">
                     <h2 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
                         <span className="flex items-center justify-center gap-2">
@@ -219,41 +236,21 @@ const AIVoiceOverFlow: React.FC<AIVoiceOverFlowProps> = ({
                     </Button>
                     <audio
                         ref={audioPlayerRef}
-                        src={voiceOverAudioSrc} // This will be the blob URL
-                        controls // TEMPORARILY ADD CONTROLS FOR DIRECT BROWSER DEBUGGING
+                        src={audioSrc}
                         onPlay={() => onSetIsAudioActuallyPlaying(true)}
                         onPause={() => onSetIsAudioActuallyPlaying(false)}
-                        onEnded={() => {
-                            onSetIsAudioActuallyPlaying(false);
-                            if (audioPlayerRef.current) {
-                                audioPlayerRef.current.currentTime = 0;
-                            }
-                        }}
+                        onEnded={() => onSetIsAudioActuallyPlaying(false)}
                         onLoadedData={() => {
-                            console.log("AIVO_FLOW: <audio onLoadedData> - Audio data loaded.");
                             if (aiVoiceOverState === 'loadingAudio') {
                                 setAiVoiceOverState('playerReady');
                             }
                         }}
-                        onCanPlay={() => {
-                            console.log("AIVO_FLOW: <audio onCanPlay> - Browser thinks it can play this audio.");
-                        }}
-                        onStalled={() => {
-                            console.warn("AIVO_FLOW: <audio onStalled> - Media data loading stalled.");
-                        }}
                         onError={(e) => {
-                            const error = (e.target as HTMLAudioElement).error;
-                            console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                            console.error("AIVO_FLOW: <audio onError> - Audio Element Error!");
-                            console.error("Error Code:", error?.code); // 1:MEDIA_ERR_ABORTED, 2:MEDIA_ERR_NETWORK, 3:MEDIA_ERR_DECODE, 4:MEDIA_ERR_SRC_NOT_SUPPORTED
-                            console.error("Error Message:", error?.message);
-                            console.dir(error); // Log the full MediaError object
-                            console.error("Current audio src (blob URL):", (e.target as HTMLAudioElement).currentSrc);
-                            console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                            console.error("Audio player error:", e);
                             setAiVoiceOverState('error');
-                            alert(`Error loading audio. Code: ${error?.code}. Message: ${error?.message || 'File might be unsupported or URL invalid.'}`);
+                            alert("Error loading audio. The file might be unsupported or the URL is invalid.");
                         }}
-                        // className="hidden" // Keep it visible with controls for now
+                        className="hidden"
                     />
                     <Button
                         variant="outline"

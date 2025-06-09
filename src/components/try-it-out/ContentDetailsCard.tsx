@@ -60,11 +60,10 @@ const ContentDetailsCard: React.FC<ContentDetailsCardProps> = ({
             <button
               key={tag}
               onClick={() => onTagToggle(tag)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                selectedTags.includes(tag)
-                  ? 'bg-[#121212] text-[#F5F5F5]'
-                  : 'bg-gray-200 text-[#121212] hover:bg-gray-300'
-              }`}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${selectedTags.includes(tag)
+                ? 'bg-[#121212] text-[#F5F5F5]'
+                : 'bg-gray-200 text-[#121212] hover:bg-gray-300'
+                }`}
             >
               {tag}
             </button>
