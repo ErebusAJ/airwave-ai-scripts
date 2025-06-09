@@ -50,10 +50,7 @@ const HeroSection: React.FC = () => {
           ref={descriptionRef}
           className="text-[#F5F5F5] text-lg md:text-xl mb-10 max-w-3xl mx-auto leading-relaxed fade-in-up opacity-0"
         >
-          Transform your creative ideas into professional scripts tailored for YouTube, TikTok, Instagram, and more. 
-          Our AI understands platform-specific formats and audience preferences, then brings your content to life 
-          with studio-quality voice synthesis. Create engaging content that resonates with your audience in minutes, 
-          not hours.
+          Generate platform-specific scripts and create AI voiceovers in minutes for YouTube, TikTok, Instagram, and more. Effortlessly bring your ideas to life with professional-quality content!
         </p>
         
         <div className="flex flex-col sm:flex-row justify-center gap-4">
